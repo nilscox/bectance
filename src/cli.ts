@@ -1,57 +1,30 @@
-import fs from 'node:fs';
-import { customAlphabet } from 'nanoid';
 import { InvalidArgumentError, program } from 'commander';
+import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { customAlphabet } from 'nanoid';
 
-const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 8);
+import * as schema from './schema';
+import pg from 'pg';
+
+const { products, stocks } = schema;
 
 const units = ['unit', 'gram', 'liter'] as const;
 type Unit = (typeof units)[number];
 
-type Product = {
-  id: string;
-  name: string;
-  unit: Unit;
-};
+const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 8);
 
-type ProductStock = {
-  id: string;
-  productId: string;
-  quantity: number;
-};
+const client = new pg.Pool({ connectionString: process.env.DATABASE_URL! });
+const db = drizzle({ client, schema, logger: process.env.DATABASE_DEBUG === 'true' });
 
-type Database = {
-  products: Product[];
-  stocks: ProductStock[];
-};
-
-function loadDatabase(): Database {
-  return JSON.parse(String(fs.readFileSync(process.env.DB_PATH!)));
-}
-
-function updateDatabase() {
-  fs.writeFileSync(process.env.DB_PATH!, JSON.stringify(db, null, 2));
-}
-
-const db = loadDatabase();
-
-function parseInt(value: string) {
-  const parsed = Number.parseInt(value, 10);
-
-  if (isNaN(parsed)) {
-    throw new InvalidArgumentError('Not a number.');
-  }
-
-  return parsed;
-}
-
-function parsePositiveInt(value: string) {
-  const parsed = parseInt(value);
+function parseQuantity(value: string) {
+  const sign = ['+', '-'].includes(value[0]) ? value[0] : null;
+  const parsed = Number(sign === null ? value : value.slice(1));
 
   if (parsed < 0) {
-    throw new InvalidArgumentError('Must be positive.');
+    throw new InvalidArgumentError('Must be a valid quantity.');
   }
 
-  return parsed;
+  return [sign, parsed] as const;
 }
 
 function parseUnit(value: string) {
@@ -62,12 +35,12 @@ function parseUnit(value: string) {
   return value;
 }
 
-function productExists(name: string) {
-  return db.products.some((product) => product.name === name);
+async function productExists(name: string) {
+  return (await db.$count(products, eq(products.name, name))) === 1;
 }
 
-function findProduct(name: string) {
-  const product = db.products.find((product) => product.name === name);
+async function findProduct(name: string) {
+  const [product] = await db.select().from(products).where(eq(products.name, name));
 
   if (product === undefined) {
     throw new Error(`Cannot find product "${name}"`);
@@ -76,32 +49,35 @@ function findProduct(name: string) {
   return product;
 }
 
-function createProduct(name: string, options: { unit: Unit }) {
-  if (productExists(name)) {
-    throw new Error(`Product "${name}" already exists`);
-  }
-
-  db.products.push({ id: nanoid(), name, unit: options.unit });
-
-  updateDatabase();
+async function findStock(productId: string) {
+  return db.query.stocks.findFirst({
+    where: (stocks, { eq }) => eq(stocks.productId, productId),
+    with: {
+      product: true,
+    },
+  });
 }
 
-function updateProduct(name: string, options: { name: string; unit: Unit }) {
-  const product = findProduct(name);
-
-  if ('name' in options) {
-    if (productExists(options.name)) {
-      throw new Error(`Product "${options.name}" already exists`);
-    }
-
-    product.name = options.name;
+async function addProduct(options: { name: string; unit: Unit }) {
+  if (await productExists(options.name)) {
+    throw new Error(`Product "${options.name}" already exists`);
   }
 
-  if ('unit' in options) {
-    product.unit = options.unit;
-  }
+  await db.insert(products).values({
+    id: nanoid(),
+    name: options.name,
+    unit: options.unit,
+  });
+}
 
-  updateDatabase();
+async function updateProduct(name: string, options: Partial<{ name: string; unit: Unit }>) {
+  await db
+    .update(products)
+    .set({
+      name: options.name,
+      unit: options.unit,
+    })
+    .where(eq(products.name, name));
 }
 
 function formatUnit(quantity: number, unit: Unit) {
@@ -118,107 +94,73 @@ function formatUnit(quantity: number, unit: Unit) {
   }
 }
 
-function getStock() {
-  const values = db.stocks.map((item) => {
-    const product = db.products.find(({ id }) => item.productId === id)!;
-
-    return {
-      product: product.name,
-      unit: product.unit,
-      quantity: item.quantity,
-    };
+async function getStock() {
+  const stocks = await db.query.stocks.findMany({
+    with: { product: true },
   });
 
-  const max = Math.max(...values.map((value) => value.product.length));
+  const max = Math.max(...stocks.map((stock) => stock.product.name.length));
 
-  for (const value of values) {
-    console.log(`${value.product.padEnd(max)} | ${formatUnit(value.quantity, value.unit)}`);
+  for (const stock of stocks) {
+    console.log(`${stock.product.name.padEnd(max)} | ${formatUnit(stock.quantity, stock.product.unit)}`);
   }
 }
 
-function updateStock(
-  productName: string,
-  update: (stock: ProductStock | undefined, productId: string) => void
-) {
-  const product = findProduct(productName);
-  let stock = db.stocks.find((item) => item.productId === product.id);
+async function updateStock(productName: string, getQuantity: (current: number) => number) {
+  const product = await findProduct(productName);
+  const stock = await findStock(product.id);
 
-  update(stock, product.id);
-  updateDatabase();
+  let quantity = getQuantity(stock?.quantity ?? 0);
+
+  if (quantity < 0) {
+    quantity = 0;
+  }
+
+  if (stock) {
+    await db.update(stocks).set({ quantity }).where(eq(stocks.id, stock.id));
+  } else {
+    await db.insert(stocks).values({ id: nanoid(), productId: product.id, quantity });
+  }
 }
 
-function addStock(productName: string, quantity: number) {
-  updateStock(productName, (stock, productId) => {
-    if (!stock) {
-      stock = { id: nanoid(), productId: productId, quantity: 0 };
-      db.stocks.push(stock);
+async function stock(productName: string, [sign, value]: [sign: '+' | '-' | null, value: number]) {
+  await updateStock(productName, (current) => {
+    if (sign === '+') {
+      return current + value;
     }
 
-    stock.quantity += quantity;
-  });
-}
-
-function removeStock(productName: string, quantity: number) {
-  updateStock(productName, (stock) => {
-    if (!stock) {
-      throw new Error(`No existing stock for product "${productName}"`);
+    if (sign === '-') {
+      return current - value;
     }
 
-    stock.quantity -= quantity;
-
-    if (stock.quantity < 0) {
-      stock.quantity = 0;
-    }
-  });
-}
-
-function setStock(productName: string, quantity: number) {
-  updateStock(productName, (stock, productId) => {
-    if (!stock) {
-      stock = { id: nanoid(), productId: productId, quantity: 0 };
-      db.stocks.push(stock);
-    }
-
-    stock.quantity = quantity;
+    return value;
   });
 }
 
 program
-  .command('create-product')
+  .command('add-product')
   .description('Create a new product')
-  .argument('<name>', 'Name of the product')
-  .requiredOption('-u, --unit <unit>', 'Unit of the product', parseUnit)
-  .action(createProduct);
+  .requiredOption('--name <name>', 'Name of the product')
+  .requiredOption('--unit <unit>', 'Unit of the product', parseUnit)
+  .action(addProduct);
 
 program
   .command('update-product')
   .description('Update an existing product')
-  .argument('<name>', 'Current name of the product')
-  .option('-n, --name <name>', 'Updated name of the product')
-  .option('-u, --unit <unit>', 'Updated unit of the product', parseUnit)
+  .argument('[name]', 'Name of the product')
+  .option('--name <name>', 'Name of the product')
+  .option('--unit <unit>', 'Unit of the product', parseUnit)
   .action(updateProduct);
 
 program.command('get-stock').description('Show the current stock').action(getStock);
 
 program
-  .command('add-stock')
-  .description('Add a quantity of product to the current stock')
+  .command('stock')
+  .description('Update the current stock')
   .argument('<product>', 'Name of the product')
-  .argument('<quantity>', 'Quantity to add to the stock', parsePositiveInt)
-  .action(addStock);
+  .argument('<quantity>', 'Quantity to set', parseQuantity)
+  .action(stock);
 
-program
-  .command('remove-stock')
-  .description('Remove a quantity of product to the current stock')
-  .argument('<product>', 'Name of the product')
-  .argument('<quantity>', 'Quantity to remove from the stock', parsePositiveInt)
-  .action(removeStock);
-
-program
-  .command('set-stock')
-  .description('Set the quantity of product in the current stock')
-  .argument('<product>', 'Name of the product')
-  .argument('<quantity>', 'Quantity to set', parsePositiveInt)
-  .action(setStock);
+program.hook('postAction', () => db.$client.end());
 
 program.parse();
