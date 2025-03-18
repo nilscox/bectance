@@ -1,7 +1,10 @@
 import { relations } from 'drizzle-orm';
-import { integer, pgEnum, pgTable, varchar } from 'drizzle-orm/pg-core';
+import { integer, PgEnum, pgEnum, pgTable, varchar } from 'drizzle-orm/pg-core';
+
+type PgEnumType<T> = T extends PgEnum<infer E> ? E[number] : never;
 
 export const unit = pgEnum('unit', ['unit', 'gram', 'liter']);
+export type Unit = PgEnumType<typeof unit>;
 
 const id = () => varchar({ length: 8 });
 
