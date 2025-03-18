@@ -7,3 +7,7 @@ export function assert(value: unknown, error = new Error('Assertion error')): as
     throw error;
   }
 }
+
+export function hasProperty<K extends PropertyKey, V>(prop: K, value: V) {
+  return (obj: Record<K, V>) => obj[prop] === value;
+}

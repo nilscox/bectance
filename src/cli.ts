@@ -1,6 +1,7 @@
 import { InvalidArgumentError, program } from 'commander';
 
 import { addProduct, updateProduct } from './domain/product';
+import { addProductToNextShoppingList, printNextShoppingList } from './domain/shopping-list';
 import { getStock, updateStock } from './domain/stock';
 import { db } from './persistence/database';
 import { Unit, unit } from './persistence/schema';
@@ -40,6 +41,15 @@ program
       return value;
     });
   });
+
+program.command('next').description('Print the next shopping list').action(printNextShoppingList);
+
+program
+  .command('add-next')
+  .description('Add a product to the next shopping list')
+  .argument('<name>', 'Name of the product')
+  .option('--quantity <value>', 'Quantity to add')
+  .action(addProductToNextShoppingList);
 
 program.hook('postAction', () => db.$client.end());
 

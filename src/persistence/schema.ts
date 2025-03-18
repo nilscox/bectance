@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { PgEnum, integer, pgEnum, pgTable, varchar } from 'drizzle-orm/pg-core';
+import { PgEnum, boolean, date, integer, numeric, pgEnum, pgTable, varchar } from 'drizzle-orm/pg-core';
 
 type PgEnumType<T> = T extends PgEnum<infer E> ? E[number] : never;
 
@@ -27,6 +27,39 @@ export const stocks = pgTable('stocks', {
 export const productStocksRelations = relations(stocks, ({ one }) => ({
   product: one(products, {
     fields: [stocks.productId],
+    references: [products.id],
+  }),
+}));
+
+export type ShoppingList = typeof shoppingList.$inferSelect;
+
+export const shoppingList = pgTable('shopping_lists', {
+  id: id().primaryKey(),
+  date: date(),
+  cost: numeric(),
+});
+
+export const shoppingListsRelations = relations(shoppingList, ({ many }) => ({
+  items: many(shoppingListItems),
+}));
+
+export type ShoppingListItem = typeof shoppingListItems.$inferSelect;
+
+export const shoppingListItems = pgTable('shopping_list_items', {
+  id: id().primaryKey(),
+  shoppingListId: id().notNull(),
+  productId: id().notNull(),
+  quantity: integer(),
+  checked: boolean().notNull(),
+});
+
+export const shoppingListItemsRelations = relations(shoppingListItems, ({ one }) => ({
+  shoppingList: one(shoppingList, {
+    fields: [shoppingListItems.shoppingListId],
+    references: [shoppingList.id],
+  }),
+  product: one(products, {
+    fields: [shoppingListItems.productId],
     references: [products.id],
   }),
 }));
