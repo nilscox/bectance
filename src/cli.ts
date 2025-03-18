@@ -1,9 +1,9 @@
 import { InvalidArgumentError, program } from 'commander';
 
-import { db } from './persistence/database';
-import { Unit, unit } from './persistence/schema';
 import { addProduct, updateProduct } from './domain/product';
 import { getStock, updateStock } from './domain/stock';
+import { db } from './persistence/database';
+import { Unit, unit } from './persistence/schema';
 
 program
   .command('add-product')

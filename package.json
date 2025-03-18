@@ -4,10 +4,13 @@
   "type": "module",
   "scripts": {
     "lint": "eslint src",
+    "format": "prettier --check src",
+    "typecheck": "tsc",
     "cli": "tsx src/cli.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/node": "^22.13.10",
     "@types/pg": "^8.11.11",
     "drizzle-kit": "^0.30.5",

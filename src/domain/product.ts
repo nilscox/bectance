@@ -1,7 +1,8 @@
 import { eq } from 'drizzle-orm';
-import { nanoid } from 'nanoid';
+
 import { db } from '../persistence/database';
-import { products, Unit } from '../persistence/schema';
+import { Unit, products } from '../persistence/schema';
+import { createId } from '../utils';
 
 export async function findProduct(name: string) {
   const [product] = await db.select().from(products).where(eq(products.name, name));
@@ -19,7 +20,7 @@ export async function addProduct(options: { name: string; unit: Unit }) {
   }
 
   await db.insert(products).values({
-    id: nanoid(),
+    id: createId(),
     name: options.name,
     unit: options.unit,
   });

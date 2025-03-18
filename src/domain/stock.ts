@@ -1,9 +1,9 @@
 import { eq } from 'drizzle-orm';
-import { nanoid } from 'nanoid';
 
-import { findProduct } from './product';
 import { db } from '../persistence/database';
 import { Unit, stocks } from '../persistence/schema';
+import { createId } from '../utils';
+import { findProduct } from './product';
 
 export async function getStock() {
   const stocks = await db.query.stocks.findMany({
@@ -44,7 +44,7 @@ export async function updateStock(productName: string, getQuantity: (current: nu
   if (stock) {
     await db.update(stocks).set({ quantity }).where(eq(stocks.id, stock.id));
   } else {
-    await db.insert(stocks).values({ id: nanoid(), productId: product.id, quantity });
+    await db.insert(stocks).values({ id: createId(), productId: product.id, quantity });
   }
 }
 
