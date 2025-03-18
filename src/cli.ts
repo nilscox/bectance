@@ -1,11 +1,12 @@
 import { Command, InvalidArgumentError } from 'commander';
+import { Table } from 'console-table-printer';
 
-import { createProduct, updateProduct } from './domain/product';
-import { createShoppingList, getShoppingList, upsertShoppingListItem } from './domain/shopping-list';
-import { getStock, upsertStock } from './domain/stock';
-import { db } from './persistence/database';
-import { Unit, unit } from './persistence/schema';
-import { printTable } from './utils';
+import { createProduct, updateProduct } from './server/domain/product';
+import { createShoppingList, getShoppingList, upsertShoppingListItem } from './server/domain/shopping-list';
+import { getStock, upsertStock } from './server/domain/stock';
+import { db } from './server/persistence/database';
+import { Unit, unit } from './server/persistence/schema';
+import { toObject } from './utils';
 
 const product = new Command('product');
 
@@ -131,4 +132,27 @@ export function formatUnit(quantity: number, unit: Unit) {
   }
 
   throw new Error('Unknown unit');
+}
+
+export function printTable(columns: string[], values: string[][]) {
+  if (values.length === 0) {
+    console.log('No data.');
+    return;
+  }
+
+  const table = new Table({
+    columns: columns.map((name) => ({ name })),
+  });
+
+  values.forEach((row) =>
+    table.addRow(
+      toObject(
+        columns,
+        (key) => key,
+        (_, index) => row[index],
+      ),
+    ),
+  );
+
+  table.printTable();
 }

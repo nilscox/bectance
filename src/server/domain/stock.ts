@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm';
 
+import { createId } from '../../utils';
 import { db } from '../persistence/database';
 import { stocks } from '../persistence/schema';
-import { createId } from '../utils';
 import { getProduct } from './product';
 
 export async function getStock() {
