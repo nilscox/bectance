@@ -1,4 +1,4 @@
-import { InvalidArgumentError, program } from 'commander';
+import { Command, InvalidArgumentError } from 'commander';
 
 import { addProduct, updateProduct } from './domain/product';
 import {
@@ -8,68 +8,61 @@ import {
   updateShoppingListItem,
 } from './domain/shopping-list';
 import { printStock, updateStock } from './domain/stock';
-import { ParsedQuantity } from './domain/utils';
 import { db } from './persistence/database';
 import { Unit, unit } from './persistence/schema';
 
-program
-  .command('add-product')
+const product = new Command('product');
+
+product
+  .command('create')
   .description('Create a new product')
   .requiredOption('--name <name>', 'Name of the product')
   .requiredOption('--unit <unit>', 'Unit of the product', parseUnit)
   .action(addProduct);
 
-program
-  .command('update-product')
+product
+  .command('product update')
   .description('Update an existing product')
   .argument('[name]', 'Name of the product')
   .option('--name <name>', 'Name of the product')
   .option('--unit <unit>', 'Unit of the product', parseUnit)
   .action(updateProduct);
 
-program.command('stock').description('Print the current stock').action(printStock);
+const stock = new Command('stock');
 
-program
-  .command('update-stock')
+stock.command('get').description('Print the current stock').action(printStock);
+
+stock
+  .command('update')
   .description('Update the current stock')
   .argument('<product>', 'Name of the product')
-  .argument('<quantity>', 'Quantity to set', parseQuantity)
-  .action(async (productName: string, [sign, value]: ParsedQuantity) => {
-    await updateStock(productName, (current) => {
-      if (sign === '+') {
-        return current + value;
-      }
+  .argument('<quantity>', 'Quantity to set', parsePositiveInteger)
+  .action(updateStock);
 
-      if (sign === '-') {
-        return current - value;
-      }
+const list = new Command('list');
 
-      return value;
-    });
-  });
-
-program
-  .command('list')
+list
+  .command('get')
   .description('Print a shopping list')
   .argument('<name>', 'Name of the shopping list')
   .action(printShoppingList);
 
-program
-  .command('add-list')
+list
+  .command('create')
   .description('Create a new shopping list')
-  .argument('<list>', 'Name of the shopping list')
+  .argument('<name>', 'Name of the shopping list')
   .action(addShoppingList);
 
-program
-  .command('add-list-item')
+list
+  .command('add-item')
   .description('Add a product to a shopping list')
   .argument('<list>', 'Name of the shopping list')
   .argument('<product>', 'Name of the product')
   .option('--quantity <value>', 'Quantity to add')
   .action(addProductToShoppingList);
 
-program
-  .command('update-list-item')
+list
+  .command('update-item')
   .description('Update an item from a shopping list')
   .argument('<list>', 'Name of the shopping list')
   .argument('<product>', 'Name of the product')
@@ -79,24 +72,15 @@ program
   .option('--no-checked', 'Mark the product as not checked')
   .action(updateShoppingListItem);
 
+const program = new Command();
+
+program.addCommand(product);
+program.addCommand(stock);
+program.addCommand(list);
+
 program.hook('postAction', () => db.$client.end());
 
 program.parse();
-
-function isQuantitySign(value: string): value is Exclude<ParsedQuantity[0], null> {
-  return ['+', '-'].includes(value);
-}
-
-function parseQuantity(value: string): ParsedQuantity {
-  const sign = isQuantitySign(value[0]) ? value[0] : null;
-  const parsed = Number(sign === null ? value : value.slice(1));
-
-  if (parsed < 0) {
-    throw new InvalidArgumentError('Must be a valid quantity.');
-  }
-
-  return [sign, parsed];
-}
 
 function parsePositiveInteger(value: string): number {
   const parsed = Number(value);

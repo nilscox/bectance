@@ -17,15 +17,9 @@ export async function printStock() {
   );
 }
 
-export async function updateStock(productName: string, getQuantity: (current: number) => number) {
+export async function updateStock(productName: string, quantity: number) {
   const product = await findProduct(productName);
   const stock = await findStock(product.id);
-
-  let quantity = getQuantity(stock?.quantity ?? 0);
-
-  if (quantity < 0) {
-    quantity = 0;
-  }
 
   if (stock) {
     await db.update(stocks).set({ quantity }).where(eq(stocks.id, stock.id));
