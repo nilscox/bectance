@@ -3,8 +3,9 @@ import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { customAlphabet } from 'nanoid';
 
-import * as schema from './schema';
 import pg from 'pg';
+import { config } from './config';
+import * as schema from './schema';
 
 const { products, stocks } = schema;
 
@@ -13,8 +14,8 @@ type Unit = (typeof units)[number];
 
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 8);
 
-const client = new pg.Pool({ connectionString: process.env.DATABASE_URL! });
-const db = drizzle({ client, schema, logger: process.env.DATABASE_DEBUG === 'true' });
+const client = new pg.Pool({ connectionString: config.database.url });
+const db = drizzle(client, { schema, logger: config.database.debug });
 
 function parseQuantity(value: string) {
   const sign = ['+', '-'].includes(value[0]) ? value[0] : null;
