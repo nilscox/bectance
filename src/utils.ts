@@ -14,6 +14,11 @@ export function hasProperty<K extends PropertyKey, V>(prop: K, value: V) {
 }
 
 export function printTable(columns: string[], values: string[][]) {
+  if (values.length === 0) {
+    console.log('No data.');
+    return;
+  }
+
   const table = new Table({
     columns: columns.map((name) => ({ name })),
   });

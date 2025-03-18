@@ -1,8 +1,14 @@
 import { InvalidArgumentError, program } from 'commander';
 
 import { addProduct, updateProduct } from './domain/product';
-import { addProductToNextShoppingList, printNextShoppingList } from './domain/shopping-list';
+import {
+  addProductToShoppingList,
+  addShoppingList,
+  printShoppingList,
+  updateShoppingListItem,
+} from './domain/shopping-list';
 import { printStock, updateStock } from './domain/stock';
+import { ParsedQuantity } from './domain/utils';
 import { db } from './persistence/database';
 import { Unit, unit } from './persistence/schema';
 
@@ -28,7 +34,7 @@ program
   .description('Update the current stock')
   .argument('<product>', 'Name of the product')
   .argument('<quantity>', 'Quantity to set', parseQuantity)
-  .action(async (productName: string, [sign, value]: [sign: '+' | '-' | null, value: number]) => {
+  .action(async (productName: string, [sign, value]: ParsedQuantity) => {
     await updateStock(productName, (current) => {
       if (sign === '+') {
         return current + value;
@@ -42,28 +48,72 @@ program
     });
   });
 
-program.command('next').description('Print the next shopping list').action(printNextShoppingList);
+program
+  .command('list')
+  .description('Print a shopping list')
+  .argument('<name>', 'Name of the shopping list')
+  .action(printShoppingList);
 
 program
-  .command('add-next')
-  .description('Add a product to the next shopping list')
-  .argument('<name>', 'Name of the product')
+  .command('add-list')
+  .description('Create a new shopping list')
+  .argument('<list>', 'Name of the shopping list')
+  .action(addShoppingList);
+
+program
+  .command('add-list-item')
+  .description('Add a product to a shopping list')
+  .argument('<list>', 'Name of the shopping list')
+  .argument('<product>', 'Name of the product')
   .option('--quantity <value>', 'Quantity to add')
-  .action(addProductToNextShoppingList);
+  .action(addProductToShoppingList);
+
+program
+  .command('update-list-item')
+  .description('Update an item from a shopping list')
+  .argument('<list>', 'Name of the shopping list')
+  .argument('<product>', 'Name of the product')
+  .option('--quantity <value>', 'Set the quantity', parsePositiveInteger)
+  .option('--no-quantity', 'Remove the quantity')
+  .option('--checked', 'Mark the product as checked')
+  .option('--no-checked', 'Mark the product as not checked')
+  .action(updateShoppingListItem);
 
 program.hook('postAction', () => db.$client.end());
 
 program.parse();
 
-function parseQuantity(value: string) {
-  const sign = ['+', '-'].includes(value[0]) ? value[0] : null;
+function isQuantitySign(value: string): value is Exclude<ParsedQuantity[0], null> {
+  return ['+', '-'].includes(value);
+}
+
+function parseQuantity(value: string): ParsedQuantity {
+  const sign = isQuantitySign(value[0]) ? value[0] : null;
   const parsed = Number(sign === null ? value : value.slice(1));
 
   if (parsed < 0) {
     throw new InvalidArgumentError('Must be a valid quantity.');
   }
 
-  return [sign, parsed] as const;
+  return [sign, parsed];
+}
+
+function parsePositiveInteger(value: string): number {
+  const parsed = Number(value);
+
+  if (Number.isNaN(parsed)) {
+    throw new InvalidArgumentError('Must be a valid number.');
+  }
+
+  if (!Number.isInteger(parsed)) {
+    throw new InvalidArgumentError('Must be an integer.');
+  }
+
+  if (parsed < 0) {
+    throw new InvalidArgumentError('Must be a positive.');
+  }
+
+  return parsed;
 }
 
 function parseUnit(value: string) {

@@ -35,6 +35,7 @@ export type ShoppingList = typeof shoppingList.$inferSelect;
 
 export const shoppingList = pgTable('shopping_lists', {
   id: id().primaryKey(),
+  name: varchar({ length: 255 }).notNull(),
   date: date(),
   cost: numeric(),
 });
