@@ -27,4 +27,10 @@ export function addDomainEventListener<Event extends keyof EventMap>(
   cb: (payload: EventMap[Event]) => void,
 ) {
   events.addListener(name, cb);
+
+  return {
+    unsubscribe() {
+      events.removeListener(name, cb);
+    },
+  };
 }
