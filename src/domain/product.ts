@@ -4,7 +4,7 @@ import { db } from '../persistence/database';
 import { Unit, products } from '../persistence/schema';
 import { createId } from '../utils';
 
-export async function findProduct(name: string) {
+export async function getProduct(name: string) {
   const [product] = await db.select().from(products).where(eq(products.name, name));
 
   if (product === undefined) {
@@ -14,7 +14,11 @@ export async function findProduct(name: string) {
   return product;
 }
 
-export async function addProduct(options: { name: string; unit: Unit }) {
+export async function listProducts() {
+  return db.query.products.findMany();
+}
+
+export async function createProduct(options: { name: string; unit: Unit }) {
   if (await productExists(options.name)) {
     throw new Error(`Product "${options.name}" already exists`);
   }

@@ -1,13 +1,8 @@
 import { Command, InvalidArgumentError } from 'commander';
 
-import { addProduct, updateProduct } from './domain/product';
-import {
-  addProductToShoppingList,
-  addShoppingList,
-  printShoppingList,
-  updateShoppingListItem,
-} from './domain/shopping-list';
-import { printStock, updateStock } from './domain/stock';
+import { createProduct, updateProduct } from './domain/product';
+import { createShoppingList, printShoppingList, upsertShoppingListItem } from './domain/shopping-list';
+import { printStock, upsertStock } from './domain/stock';
 import { db } from './persistence/database';
 import { Unit, unit } from './persistence/schema';
 
@@ -18,7 +13,7 @@ product
   .description('Create a new product')
   .requiredOption('--name <name>', 'Name of the product')
   .requiredOption('--unit <unit>', 'Unit of the product', parseUnit)
-  .action(addProduct);
+  .action(createProduct);
 
 product
   .command('product update')
@@ -37,7 +32,7 @@ stock
   .description('Update the current stock')
   .argument('<product>', 'Name of the product')
   .argument('<quantity>', 'Quantity to set', parsePositiveInteger)
-  .action(updateStock);
+  .action(upsertStock);
 
 const list = new Command('list');
 
@@ -51,26 +46,18 @@ list
   .command('create')
   .description('Create a new shopping list')
   .argument('<name>', 'Name of the shopping list')
-  .action(addShoppingList);
+  .action(createShoppingList);
 
 list
-  .command('add-item')
-  .description('Add a product to a shopping list')
-  .argument('<list>', 'Name of the shopping list')
-  .argument('<product>', 'Name of the product')
-  .option('--quantity <value>', 'Quantity to add')
-  .action(addProductToShoppingList);
-
-list
-  .command('update-item')
-  .description('Update an item from a shopping list')
+  .command('item')
+  .description('Create or update an item from a shopping list')
   .argument('<list>', 'Name of the shopping list')
   .argument('<product>', 'Name of the product')
   .option('--quantity <value>', 'Set the quantity', parsePositiveInteger)
   .option('--no-quantity', 'Remove the quantity')
   .option('--checked', 'Mark the product as checked')
   .option('--no-checked', 'Mark the product as not checked')
-  .action(updateShoppingListItem);
+  .action(upsertShoppingListItem);
 
 const program = new Command();
 
