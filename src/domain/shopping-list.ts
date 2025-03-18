@@ -8,9 +8,8 @@ import {
   shoppingList,
   shoppingListItems,
 } from '../persistence/schema';
-import { createId, hasProperty, printTable } from '../utils';
+import { createId, hasProperty } from '../utils';
 import { getProduct } from './product';
-import { formatUnit } from './utils';
 
 export async function getShoppingList(name: string) {
   const list = await db.query.shoppingList.findFirst({
@@ -29,19 +28,6 @@ export async function getShoppingList(name: string) {
   }
 
   return list;
-}
-
-export async function printShoppingList(shoppingListName: string) {
-  const list = await getShoppingList(shoppingListName);
-
-  printTable(
-    ['Product', 'Qty', 'Checked'],
-    list.items.map((item) => [
-      item.product.name,
-      item.quantity ? formatUnit(item.quantity, item.product.unit) : '',
-      item.checked ? 'x' : '',
-    ]),
-  );
 }
 
 export async function createShoppingList(shoppingListName: string) {

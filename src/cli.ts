@@ -1,10 +1,11 @@
 import { Command, InvalidArgumentError } from 'commander';
 
 import { createProduct, updateProduct } from './domain/product';
-import { createShoppingList, printShoppingList, upsertShoppingListItem } from './domain/shopping-list';
-import { printStock, upsertStock } from './domain/stock';
+import { createShoppingList, getShoppingList, upsertShoppingListItem } from './domain/shopping-list';
+import { getStock, upsertStock } from './domain/stock';
 import { db } from './persistence/database';
 import { Unit, unit } from './persistence/schema';
+import { printTable } from './utils';
 
 const product = new Command('product');
 
@@ -25,7 +26,17 @@ product
 
 const stock = new Command('stock');
 
-stock.command('get').description('Print the current stock').action(printStock);
+stock
+  .command('get')
+  .description('Print the current stock')
+  .action(async () => {
+    const stocks = await getStock();
+
+    printTable(
+      ['Product', 'Qty'],
+      stocks.map((stock) => [stock.product.name, formatUnit(stock.quantity, stock.product.unit)]),
+    );
+  });
 
 stock
   .command('update')
@@ -40,7 +51,18 @@ list
   .command('get')
   .description('Print a shopping list')
   .argument('<name>', 'Name of the shopping list')
-  .action(printShoppingList);
+  .action(async (name) => {
+    const list = await getShoppingList(name);
+
+    printTable(
+      ['Product', 'Qty', 'Checked'],
+      list.items.map((item) => [
+        item.product.name,
+        item.quantity ? formatUnit(item.quantity, item.product.unit) : '',
+        item.checked ? 'x' : '',
+      ]),
+    );
+  });
 
 list
   .command('create')
@@ -93,4 +115,20 @@ function parseUnit(value: string) {
   }
 
   return value;
+}
+
+export function formatUnit(quantity: number, unit: Unit) {
+  if (unit === 'unit') {
+    return `${quantity}`;
+  }
+
+  if (unit === 'gram') {
+    return `${quantity}g`;
+  }
+
+  if (unit === 'liter') {
+    return `${quantity}L`;
+  }
+
+  throw new Error('Unknown unit');
 }

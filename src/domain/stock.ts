@@ -2,23 +2,13 @@ import { eq } from 'drizzle-orm';
 
 import { db } from '../persistence/database';
 import { stocks } from '../persistence/schema';
-import { createId, printTable } from '../utils';
+import { createId } from '../utils';
 import { getProduct } from './product';
-import { formatUnit } from './utils';
 
 export async function getStock() {
   return db.query.stocks.findMany({
     with: { product: true },
   });
-}
-
-export async function printStock() {
-  const stocks = await getStock();
-
-  printTable(
-    ['Product', 'Qty'],
-    stocks.map((stock) => [stock.product.name, formatUnit(stock.quantity, stock.product.unit)]),
-  );
 }
 
 export async function upsertStock(productName: string, quantity: number) {
