@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { validateRequestBody } from 'zod-express-middleware';
 
 import { config } from './config';
+import { addDomainEventListener } from './domain/events';
 import { createProduct, getProduct, listProducts, updateProduct } from './domain/product';
 import { createShoppingList, getShoppingList, upsertShoppingListItem } from './domain/shopping-list';
 import { getStock, upsertStock } from './domain/stock';
@@ -90,6 +91,12 @@ app.use(((err, req, res, next) => {
   res.status(500).send(err.message ?? 'Unknown error');
   void next;
 }) satisfies ErrorRequestHandler);
+
+const events = ['shoppingListItemCreated', 'shoppingListItemUpdated'] as const;
+
+for (const event of events) {
+  addDomainEventListener(event, (payload) => console.log(event, payload));
+}
 
 const { host, port } = config.server;
 

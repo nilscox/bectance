@@ -9,6 +9,7 @@ import {
   shoppingListItems,
 } from '../persistence/schema';
 import { createId, hasProperty } from '../utils';
+import { emitDomainEvent } from './events';
 import { getProduct } from './product';
 
 export async function getShoppingList(name: string) {
@@ -58,13 +59,17 @@ export async function createShoppingListItem(
   product: Product,
   options: Partial<{ quantity: number | false; checked: boolean }>,
 ) {
-  await db.insert(shoppingListItems).values({
+  const values = {
     id: createId(),
     shoppingListId: list.id,
     productId: product.id,
     quantity: options.quantity || undefined,
     checked: options.checked ?? false,
-  });
+  };
+
+  await db.insert(shoppingListItems).values(values);
+
+  emitDomainEvent('shoppingListItemCreated', values);
 }
 
 export async function updateShoppingListItem(
@@ -91,11 +96,12 @@ export async function updateShoppingListItem(
     }
   };
 
-  await db
-    .update(shoppingListItems)
-    .set({
-      quantity: getQuantity(),
-      checked: getChecked(),
-    })
-    .where(eq(shoppingListItems.id, item.id));
+  const values = {
+    quantity: getQuantity(),
+    checked: getChecked(),
+  };
+
+  await db.update(shoppingListItems).set(values).where(eq(shoppingListItems.id, item.id));
+
+  emitDomainEvent('shoppingListItemUpdated', { id: item.id, ...values });
 }
