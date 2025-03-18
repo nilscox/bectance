@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import { assert } from '../utils';
 
 export const config = getConfig();

@@ -7,8 +7,8 @@
     "format": "prettier --check src",
     "typecheck": "tsc",
     "cli": "tsx src/cli.ts",
-    "start": "tsx src/server.ts",
-    "dev": "nodemon -w src -e ts -x 'npm start'"
+    "start": "tsx src/server",
+    "dev": "nodemon -w .env -w src -e ts -x 'npm start'"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
@@ -25,6 +25,7 @@
   "dependencies": {
     "commander": "^13.1.0",
     "console-table-printer": "^2.12.1",
+    "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.1",
     "express": "^5.0.1",
     "nanoid": "^5.1.3",
