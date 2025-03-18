@@ -2,15 +2,20 @@ import { isNull } from 'drizzle-orm';
 
 import { db } from '../persistence/database';
 import { shoppingList, shoppingListItems } from '../persistence/schema';
-import { createId, hasProperty } from '../utils';
+import { createId, hasProperty, printTable } from '../utils';
 import { findProduct } from './product';
+import { formatUnit } from './utils';
 
 export async function printNextShoppingList() {
   const list = await getNextShoppingList();
 
-  for (const item of list.items) {
-    console.log(`${item.product.name} ${item.quantity ? `(${item.quantity})` : ''} `);
-  }
+  printTable(
+    ['Product', 'Qty'],
+    list.items.map((item) => [
+      item.product.name,
+      item.quantity ? formatUnit(item.quantity, item.product.unit) : '',
+    ]),
+  );
 }
 
 export async function addProductToNextShoppingList(

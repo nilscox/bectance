@@ -2,7 +2,7 @@ import { InvalidArgumentError, program } from 'commander';
 
 import { addProduct, updateProduct } from './domain/product';
 import { addProductToNextShoppingList, printNextShoppingList } from './domain/shopping-list';
-import { getStock, updateStock } from './domain/stock';
+import { printStock, updateStock } from './domain/stock';
 import { db } from './persistence/database';
 import { Unit, unit } from './persistence/schema';
 
@@ -21,10 +21,10 @@ program
   .option('--unit <unit>', 'Unit of the product', parseUnit)
   .action(updateProduct);
 
-program.command('get-stock').description('Show the current stock').action(getStock);
+program.command('stock').description('Print the current stock').action(printStock);
 
 program
-  .command('stock')
+  .command('update-stock')
   .description('Update the current stock')
   .argument('<product>', 'Name of the product')
   .argument('<quantity>', 'Quantity to set', parseQuantity)

@@ -1,34 +1,20 @@
 import { eq } from 'drizzle-orm';
 
 import { db } from '../persistence/database';
-import { Unit, stocks } from '../persistence/schema';
-import { createId } from '../utils';
+import { stocks } from '../persistence/schema';
+import { createId, printTable } from '../utils';
 import { findProduct } from './product';
+import { formatUnit } from './utils';
 
-export async function getStock() {
+export async function printStock() {
   const stocks = await db.query.stocks.findMany({
     with: { product: true },
   });
 
-  const max = Math.max(...stocks.map((stock) => stock.product.name.length));
-
-  for (const stock of stocks) {
-    console.log(`${stock.product.name.padEnd(max)} | ${formatUnit(stock.quantity, stock.product.unit)}`);
-  }
-}
-
-function formatUnit(quantity: number, unit: Unit) {
-  if (unit === 'unit') {
-    return `${quantity}`;
-  }
-
-  if (unit === 'gram') {
-    return `${quantity}g`;
-  }
-
-  if (unit === 'liter') {
-    return `${quantity}L`;
-  }
+  printTable(
+    ['Product', 'Qty'],
+    stocks.map((stock) => [stock.product.name, formatUnit(stock.quantity, stock.product.unit)]),
+  );
 }
 
 export async function updateStock(productName: string, getQuantity: (current: number) => number) {
