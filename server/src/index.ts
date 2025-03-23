@@ -1,8 +1,11 @@
-import { app } from './app';
-import { config } from './config';
-import { addDomainEventListener } from './domain/events';
+import 'dotenv/config';
 
-const { host, port } = config.server;
+import { addDomainEventListener } from '@boubouffe/core';
+
+import { app } from './app';
+
+const host = process.env.HOST ?? 'localhost';
+const port = Number(process.env.PORT ?? '8000');
 
 const server = app.listen(port, host, () => {
   console.debug(`Server listening on ${host}:${port}`);

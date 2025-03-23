@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm';
 
-import { createId } from '../../utils';
 import { db } from '../persistence/database';
 import { Unit, products } from '../persistence/schema';
+import { createId } from '../utils';
 
 export async function getProduct(name: string) {
   const [product] = await db.select().from(products).where(eq(products.name, name));

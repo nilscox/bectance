@@ -1,12 +1,19 @@
+import 'dotenv/config';
+
+import {
+  Unit,
+  closeDatabaseConnection,
+  createProduct,
+  createShoppingList,
+  getShoppingList,
+  getStock,
+  toObject,
+  updateProduct,
+  upsertShoppingListItem,
+  upsertStock,
+} from '@boubouffe/core';
 import { Command, InvalidArgumentError } from 'commander';
 import { Table } from 'console-table-printer';
-
-import { createProduct, updateProduct } from './server/domain/product';
-import { createShoppingList, getShoppingList, upsertShoppingListItem } from './server/domain/shopping-list';
-import { getStock, upsertStock } from './server/domain/stock';
-import { db } from './server/persistence/database';
-import { Unit, unit } from './server/persistence/schema';
-import { toObject } from './utils';
 
 const product = new Command('product');
 
@@ -88,7 +95,7 @@ program.addCommand(product);
 program.addCommand(stock);
 program.addCommand(list);
 
-program.hook('postAction', () => db.$client.end());
+program.hook('postAction', () => closeDatabaseConnection());
 
 program.parse();
 
@@ -111,7 +118,9 @@ function parsePositiveInteger(value: string): number {
 }
 
 function parseUnit(value: string) {
-  if (!unit.enumValues.includes(value as Unit)) {
+  const units: Unit[] = ['unit', 'gram', 'liter'];
+
+  if (!units.includes(value as Unit)) {
     throw new InvalidArgumentError('Not a valid unit.');
   }
 

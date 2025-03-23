@@ -1,6 +1,5 @@
 import { eq } from 'drizzle-orm';
 
-import { createId, hasProperty } from '../../utils';
 import { db } from '../persistence/database';
 import {
   Product,
@@ -9,6 +8,7 @@ import {
   shoppingList,
   shoppingListItems,
 } from '../persistence/schema';
+import { createId, hasProperty } from '../utils';
 import { emitDomainEvent } from './events';
 import { getProduct } from './product';
 

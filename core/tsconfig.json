@@ -1,0 +1,12 @@
+{
+  "include": [
+    "./src/**/*",
+    "./drizzle.config.ts"
+  ],
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true
+  }
+}

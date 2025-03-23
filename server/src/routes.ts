@@ -1,11 +1,18 @@
+import {
+  addDomainEventListener,
+  createProduct,
+  createShoppingList,
+  getProduct,
+  getShoppingList,
+  getStock,
+  listProducts,
+  updateProduct,
+  upsertShoppingListItem,
+  upsertStock,
+} from '@boubouffe/core';
 import express from 'express';
 import { z } from 'zod';
 import { validateRequestBody } from 'zod-express-middleware';
-
-import { addDomainEventListener } from './domain/events';
-import { createProduct, getProduct, listProducts, updateProduct } from './domain/product';
-import { createShoppingList, getShoppingList, upsertShoppingListItem } from './domain/shopping-list';
-import { getStock, upsertStock } from './domain/stock';
 
 export const routes = express.Router();
 

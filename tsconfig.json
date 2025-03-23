@@ -1,9 +1,14 @@
 {
-  "include": ["src/**/*"],
-  "compilerOptions": {
-    "noEmit": true,
-    "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true
-  }
+  "include": [],
+  "references": [
+    {
+      "path": "./cli/tsconfig.json"
+    },
+    {
+      "path": "./core/tsconfig.json"
+    },
+    {
+      "path": "./server/tsconfig.json"
+    },
+  ]
 }
