@@ -9,11 +9,14 @@
     "serve": "vite preview"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.0.15",
+    "tailwindcss": "^4.0.15",
     "typescript": "^5.8.2",
     "vite": "^6.2.2",
     "vite-plugin-solid": "^2.11.6"
   },
   "dependencies": {
+    "@ark-ui/solid": "^5.2.0",
     "@boubouffe/core": "workspace:^",
     "solid-js": "^1.9.5"
   }
