@@ -14,6 +14,7 @@
     "vite-plugin-solid": "^2.11.6"
   },
   "dependencies": {
+    "@boubouffe/core": "workspace:^",
     "solid-js": "^1.9.5"
   }
 }

@@ -10,4 +10,4 @@ export {
 } from './domain/shopping-list';
 export { getStock, upsertStock } from './domain/stock';
 export { closeDatabaseConnection } from './persistence/database';
-export * from './types';
+export * from './dtos';

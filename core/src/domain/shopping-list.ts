@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm';
 
+import * as dtos from '../dtos';
 import { db } from '../persistence/database';
 import {
   Product,
@@ -12,7 +13,7 @@ import { createId, hasProperty } from '../utils';
 import { emitDomainEvent } from './events';
 import { getProduct } from './product';
 
-export async function getShoppingList(name: string) {
+export async function getShoppingList(name: string): Promise<dtos.ShoppingList> {
   const list = await db.query.shoppingList.findFirst({
     where: eq(shoppingList.name, name),
     with: {
