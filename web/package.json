@@ -1,0 +1,19 @@
+{
+  "name": "@boubouffe/web",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2",
+    "vite": "^6.2.2",
+    "vite-plugin-solid": "^2.11.6"
+  },
+  "dependencies": {
+    "solid-js": "^1.9.5"
+  }
+}
