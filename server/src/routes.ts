@@ -77,19 +77,15 @@ shoppingList.get('/:list/events', (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
 
-  const handleEvent = (event: Record<string, unknown>) => {
-    for (const [key, value] of Object.entries(event)) {
-      if (value !== undefined) {
-        res.write(`${key}: ${value}\n`);
-      }
-    }
-    res.write('\n');
+  const handleEvent = (event: string, data: unknown) => {
+    res.write(`event: ${event}\n`);
+    res.write(`data: ${JSON.stringify(data)}\n\n`);
   };
 
   const events = ['shoppingListItemCreated', 'shoppingListItemUpdated'] as const;
 
   const subscriptions = events.map((event) => {
-    return addDomainEventListener(event, (payload) => handleEvent({ event, ...payload }));
+    return addDomainEventListener(event, (payload) => handleEvent(event, payload));
   });
 
   console.debug('Client connected to shopping list event stream');
