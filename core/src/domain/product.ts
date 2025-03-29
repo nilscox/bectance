@@ -1,8 +1,18 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import { db } from '../persistence/database';
 import { Unit, products } from '../persistence/schema';
 import { createId } from '../utils';
+
+export async function listProducts(filters?: { name?: string }) {
+  let where = and();
+
+  if (filters?.name !== undefined) {
+    where = and(where, eq(products.name, filters.name));
+  }
+
+  return db.query.products.findMany({ where });
+}
 
 export async function getProduct(productId: string) {
   const [product] = await db.select().from(products).where(eq(products.id, productId));
@@ -12,10 +22,6 @@ export async function getProduct(productId: string) {
   }
 
   return product;
-}
-
-export async function listProducts() {
-  return db.query.products.findMany();
 }
 
 export async function createProduct(options: { name: string; unit: Unit }) {

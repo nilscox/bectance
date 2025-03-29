@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import * as dtos from '../dtos';
 import { db } from '../persistence/database';
@@ -12,6 +12,25 @@ import {
 import { createId, hasProperty } from '../utils';
 import { emitDomainEvent } from './events';
 import { getProduct } from './product';
+
+export async function listShoppingLists(filters?: { name?: string }): Promise<dtos.ShoppingList[]> {
+  let where = and();
+
+  if (filters?.name !== undefined) {
+    where = and(where, eq(shoppingList.name, filters.name));
+  }
+
+  return db.query.shoppingList.findMany({
+    where,
+    with: {
+      items: {
+        with: {
+          product: true,
+        },
+      },
+    },
+  });
+}
 
 export async function getShoppingList(listId: string): Promise<dtos.ShoppingList> {
   const list = await db.query.shoppingList.findFirst({

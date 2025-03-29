@@ -10,7 +10,8 @@ import {
   upsertShoppingListItem,
   upsertStock,
 } from '@boubouffe/core';
-import express from 'express';
+import { listShoppingLists } from '@boubouffe/core/src/domain/shopping-list';
+import express, { Request } from 'express';
 import { z } from 'zod';
 import { validateRequestBody } from 'zod-express-middleware';
 
@@ -24,10 +25,16 @@ routes.use('/product', product);
 routes.use('/stock', stock);
 routes.use('/shopping-list', shoppingList);
 
+function getQueryParam(req: Request, name: string): string | undefined {
+  if (typeof req.query[name] === 'string') {
+    return req.query[name];
+  }
+}
+
 // product
 
 product.get('/', async (req, res) => {
-  res.json(await listProducts());
+  res.json(await listProducts({ name: getQueryParam(req, 'name') }));
 });
 
 product.get('/:productId', async (req, res) => {
@@ -67,6 +74,10 @@ stock.put('/:productId', validateRequestBody(updateStockBody), async (req, res) 
 });
 
 // shopping list
+
+shoppingList.get('/', async (req, res) => {
+  res.json(await listShoppingLists({ name: getQueryParam(req, 'name') }));
+});
 
 shoppingList.get('/:listId', async (req, res) => {
   res.json(await getShoppingList(req.params.listId));

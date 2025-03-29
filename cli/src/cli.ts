@@ -1,21 +1,10 @@
 import 'dotenv/config';
 
-import {
-  Unit,
-  closeDatabaseConnection,
-  createProduct,
-  createShoppingList,
-  findProductByName,
-  findShoppingListByName,
-  getShoppingList,
-  getStock,
-  toObject,
-  updateProduct,
-  upsertShoppingListItem,
-  upsertStock,
-} from '@boubouffe/core';
+import { ShoppingList, Stock, Unit, toObject } from '@boubouffe/core';
 import { Command, InvalidArgumentError } from 'commander';
 import { Table } from 'console-table-printer';
+
+import { api } from './api';
 
 const product = new Command('product');
 
@@ -24,15 +13,19 @@ product
   .description('Create a new product')
   .requiredOption('--name <name>', 'Name of the product')
   .requiredOption('--unit <unit>', 'Unit of the product', parseUnit)
-  .action(createProduct);
+  .action(async ({ name, unit }) => {
+    await api('POST', '/product', { body: { name, unit } });
+  });
 
 product
-  .command('product update')
+  .command('update')
   .description('Update an existing product')
-  .argument('[name]', 'Name of the product', parseProductName)
+  .argument('<name>', 'Name of the product', parseProductName)
   .option('--name <name>', 'Name of the product')
   .option('--unit <unit>', 'Unit of the product', parseUnit)
-  .action(updateProduct);
+  .action(async (productId, options) => {
+    await api('PUT', `/product/${productId}`, { body: options });
+  });
 
 const stock = new Command('stock');
 
@@ -40,7 +33,7 @@ stock
   .command('get')
   .description('Print the current stock')
   .action(async () => {
-    const stocks = await getStock();
+    const stocks = await api<Stock[]>('GET', '/stock');
 
     printTable(
       ['Product', 'Qty'],
@@ -53,7 +46,11 @@ stock
   .description('Update the current stock')
   .argument('<product>', 'Name of the product', parseProductName)
   .argument('<quantity>', 'Quantity to set', parsePositiveInteger)
-  .action(upsertStock);
+  .action(async (productId, quantity) => {
+    await api<Stock[]>('PUT', `/stock/${productId}`, {
+      body: { quantity },
+    });
+  });
 
 const list = new Command('list');
 
@@ -61,8 +58,8 @@ list
   .command('get')
   .description('Print a shopping list')
   .argument('<name>', 'Name of the shopping list', parseShoppingListName)
-  .action(async (id) => {
-    const list = await getShoppingList(id);
+  .action(async (listId) => {
+    const list = await api<ShoppingList>('GET', `/shopping-list/${listId}`);
 
     printTable(
       ['Product', 'Qty', 'Checked'],
@@ -78,7 +75,11 @@ list
   .command('create')
   .description('Create a new shopping list')
   .argument('<name>', 'Name of the shopping list')
-  .action(createShoppingList);
+  .action(async (name) => {
+    await api('POST', '/shopping-list', {
+      body: { name },
+    });
+  });
 
 list
   .command('item')
@@ -89,7 +90,11 @@ list
   .option('--no-quantity', 'Remove the quantity')
   .option('--checked', 'Mark the product as checked')
   .option('--no-checked', 'Mark the product as not checked')
-  .action(upsertShoppingListItem);
+  .action(async (listId, productId, options) => {
+    await api('PUT', `/shopping-list/${listId}/${productId}`, {
+      body: options,
+    });
+  });
 
 const program = new Command();
 
@@ -100,8 +105,6 @@ program.addCommand(list);
 program.hook('preAction', async function (_, action) {
   action.processedArgs = await Promise.all(action.processedArgs);
 });
-
-program.hook('postAction', () => closeDatabaseConnection());
 
 program.parse();
 
@@ -134,13 +137,25 @@ function parseUnit(value: string) {
 }
 
 async function parseShoppingListName(name: string) {
-  const list = await findShoppingListByName(name);
+  const [list] = await api<{ id: string }[]>('GET', '/shopping-list', {
+    query: { name },
+  });
+
+  if (!list) {
+    throw new InvalidArgumentError('Cannot find shopping list');
+  }
 
   return list.id;
 }
 
 async function parseProductName(name: string) {
-  const product = await findProductByName(name);
+  const [product] = await api<{ id: string }[]>('GET', '/product', {
+    query: { name },
+  });
+
+  if (!product) {
+    throw new InvalidArgumentError('Cannot find product');
+  }
 
   return product.id;
 }
