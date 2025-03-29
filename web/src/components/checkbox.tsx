@@ -11,7 +11,7 @@ export function Checkbox(props: {
     <ArkCheckbox.Root
       checked={props.checked}
       onCheckedChange={(event) => props.onChange?.(Boolean(event.checked))}
-      class="inline-flex flex-row items-center gap-1"
+      class="inline-flex flex-row items-center gap-2"
     >
       <ArkCheckbox.Control class="border rounded size-4">
         <ArkCheckbox.Indicator>

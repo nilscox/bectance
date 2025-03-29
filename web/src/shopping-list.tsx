@@ -7,19 +7,23 @@ export function ShoppingList(props: { listId: string }) {
   const [list, { onItemChecked }] = useShoppingList(() => props.listId);
 
   return (
-    <ul>
-      <For each={list.latest?.items}>
-        {(item) => (
-          <li>
-            <Checkbox
-              label={item.product.name}
-              checked={item.checked}
-              onChange={(checked) => onItemChecked(item.product.id, checked)}
-            />
-          </li>
-        )}
-      </For>
-    </ul>
+    <div class="p-4 flex flex-col gap-4">
+      <div class="text-3xl">{list.latest?.name}</div>
+
+      <ul class="space-y-2">
+        <For each={list.latest?.items}>
+          {(item) => (
+            <li>
+              <Checkbox
+                label={item.product.name}
+                checked={item.checked}
+                onChange={(checked) => onItemChecked(item.product.id, checked)}
+              />
+            </li>
+          )}
+        </For>
+      </ul>
+    </div>
   );
 }
 
