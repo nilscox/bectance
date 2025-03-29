@@ -1,12 +1,16 @@
 {
   "include": ["./src/**/*"],
-  "references": [{ "path": "../core" }],
+  "references": [{ "path": "../shared" }],
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "outDir": "./dist",
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true
+    "strict": true,
+    "paths": {
+      "@boubouffe/shared/dtos": ["../shared/src/dtos.ts"],
+      "@boubouffe/shared/utils": ["../shared/src/utils.ts"]
+    }
   }
 }

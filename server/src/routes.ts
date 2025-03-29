@@ -1,19 +1,18 @@
-import {
-  addDomainEventListener,
-  createProduct,
-  createShoppingList,
-  getProduct,
-  getShoppingList,
-  getStock,
-  listProducts,
-  listShoppingLists,
-  updateProduct,
-  upsertShoppingListItem,
-  upsertStock,
-} from '@boubouffe/core';
-import express, { Request } from 'express';
+import * as dtos from '@boubouffe/shared/dtos';
+import express, { Request, Response } from 'express';
 import { z } from 'zod';
 import { validateRequestBody } from 'zod-express-middleware';
+
+import { createProduct, getProduct, listProducts, updateProduct } from './domain/product.js';
+import {
+  createShoppingList,
+  getShoppingList,
+  listShoppingLists,
+  upsertShoppingListItem,
+} from './domain/shopping-list.js';
+import { getStock, upsertStock } from './domain/stock.js';
+import { addDomainEventListener } from './events.js';
+import { Product, ShoppingList, ShoppingListItem, Stock } from './persistence/schema.js';
 
 export const routes = express.Router();
 
@@ -33,12 +32,24 @@ function getQueryParam(req: Request, name: string): string | undefined {
 
 // product
 
-product.get('/', async (req, res) => {
-  res.json(await listProducts({ name: getQueryParam(req, 'name') }));
+function mapProduct(product: Product): dtos.Product {
+  return {
+    id: product.id,
+    name: product.name,
+    unit: product.unit,
+  };
+}
+
+product.get('/', async (req, res: Response<dtos.Product[]>) => {
+  const products = await listProducts({ name: getQueryParam(req, 'name') });
+
+  res.json(products.map(mapProduct));
 });
 
-product.get('/:productId', async (req, res) => {
-  res.json(await getProduct(req.params.productId));
+product.get('/:productId', async (req, res: Response<dtos.Product>) => {
+  const product = await getProduct(req.params.productId);
+
+  res.json(mapProduct(product));
 });
 
 const createProductBody = z.object({
@@ -60,8 +71,17 @@ product.put('/:productId', validateRequestBody(updateProductBody), async (req, r
 
 // stock
 
-stock.get('/', async (req, res) => {
-  res.json(await getStock());
+function mapStock(stock: Stock & { product: Product }): dtos.ProductStock {
+  return {
+    ...mapProduct(stock.product),
+    quantity: stock.quantity,
+  };
+}
+
+stock.get('/', async (req, res: Response<dtos.ProductStock[]>) => {
+  const stock = await getStock();
+
+  res.json(stock.map(mapStock));
 });
 
 const updateStockBody = z.object({
@@ -75,12 +95,33 @@ stock.put('/:productId', validateRequestBody(updateStockBody), async (req, res) 
 
 // shopping list
 
-shoppingList.get('/', async (req, res) => {
-  res.json(await listShoppingLists({ name: getQueryParam(req, 'name') }));
+function mapShoppingList(
+  list: ShoppingList & { items: (ShoppingListItem & { product: Product })[] },
+): dtos.ShoppingList {
+  return {
+    id: list.id,
+    name: list.name,
+    date: list.date,
+    cost: list.cost,
+    items: list.items.map((item) => ({
+      id: item.id,
+      quantity: item.quantity,
+      checked: item.checked,
+      product: mapProduct(item.product),
+    })),
+  };
+}
+
+shoppingList.get('/', async (req, res: Response<dtos.ShoppingList[]>) => {
+  const lists = await listShoppingLists({ name: getQueryParam(req, 'name') });
+
+  res.json(lists.map(mapShoppingList));
 });
 
-shoppingList.get('/:listId', async (req, res) => {
-  res.json(await getShoppingList(req.params.listId));
+shoppingList.get('/:listId', async (req, res: Response<dtos.ShoppingList>) => {
+  const list = await getShoppingList(req.params.listId);
+
+  res.json(mapShoppingList(list));
 });
 
 shoppingList.get('/:listId/events', (req, res) => {

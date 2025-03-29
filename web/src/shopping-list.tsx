@@ -1,4 +1,4 @@
-import type { ShoppingList } from '@boubouffe/core';
+import type { DomainEvents, ShoppingList } from '@boubouffe/shared/dtos';
 import { createQuery, useQueryClient } from '@tanstack/solid-query';
 import { For, onCleanup, onMount } from 'solid-js';
 
@@ -66,9 +66,11 @@ function useShoppingList(getListId: () => string) {
     const eventSource = new EventSource(`/api/shopping-list/${getListId()}/events`);
 
     eventSource.addEventListener('shoppingListItemUpdated', (event) => {
-      const data: { id: string; checked: boolean } = JSON.parse(event.data);
+      const data: DomainEvents['shoppingListItemUpdated'] = JSON.parse(event.data);
 
-      setItemChecked(data.id, data.checked);
+      if (data.checked !== undefined) {
+        setItemChecked(data.id, data.checked);
+      }
     });
 
     eventSource.onerror = (err) => {

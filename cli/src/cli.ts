@@ -1,6 +1,7 @@
 import 'dotenv/config';
 
-import { ShoppingList, Stock, Unit, toObject } from '@boubouffe/core';
+import { ProductStock, ShoppingList, Unit } from '@boubouffe/shared/dtos';
+import { toObject } from '@boubouffe/shared/utils';
 import { Command, InvalidArgumentError } from 'commander';
 import { Table } from 'console-table-printer';
 
@@ -33,11 +34,11 @@ stock
   .command('get')
   .description('Print the current stock')
   .action(async () => {
-    const stocks = await api<Stock[]>('GET', '/stock');
+    const stocks = await api<ProductStock[]>('GET', '/stock');
 
     printTable(
       ['Product', 'Qty'],
-      stocks.map((stock) => [stock.product.name, formatUnit(stock.quantity, stock.product.unit)]),
+      stocks.map((product) => [product.name, formatUnit(product.quantity, product.unit)]),
     );
   });
 
@@ -47,7 +48,7 @@ stock
   .argument('<product>', 'Name of the product', parseProductName)
   .argument('<quantity>', 'Quantity to set', parsePositiveInteger)
   .action(async (productId, quantity) => {
-    await api<Stock[]>('PUT', `/stock/${productId}`, {
+    await api('PUT', `/stock/${productId}`, {
       body: { quantity },
     });
   });

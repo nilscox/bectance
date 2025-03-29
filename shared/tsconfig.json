@@ -6,6 +6,7 @@
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "composite": true,
+    "declaration": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "strict": true

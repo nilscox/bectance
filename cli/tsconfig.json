@@ -1,9 +1,14 @@
 {
   "include": ["./src/**/*"],
+  "references": [{ "path": "../shared" }],
   "compilerOptions": {
     "noEmit": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true
+    "strict": true,
+    "paths": {
+      "@boubouffe/shared/dtos": ["../shared/src/dtos.ts"],
+      "@boubouffe/shared/utils": ["../shared/src/utils.ts"]
+    }
   }
 }

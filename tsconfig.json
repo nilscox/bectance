@@ -2,8 +2,8 @@
   "include": [],
   "references": [
     { "path": "./cli/tsconfig.json" },
-    { "path": "./core/tsconfig.json" },
     { "path": "./server/tsconfig.json" },
+    { "path": "./shared/tsconfig.json" },
     { "path": "./web/tsconfig.json" }
   ]
 }

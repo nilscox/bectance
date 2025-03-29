@@ -1,5 +1,6 @@
 {
   "include": ["./src/**/*"],
+  "references": [{ "path": "../shared" }],
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
@@ -12,6 +13,10 @@
     "noEmit": true,
     "isolatedModules": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@boubouffe/shared/dtos": ["../shared/src/dtos.ts"],
+      "@boubouffe/shared/utils": ["../shared/src/utils.ts"]
+    }
   }
 }

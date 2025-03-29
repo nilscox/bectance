@@ -9,7 +9,7 @@
     "start": "tsx src/cli.ts"
   },
   "dependencies": {
-    "@boubouffe/core": "workspace:^",
+    "@boubouffe/shared": "workspace:^",
     "commander": "^13.1.0",
     "console-table-printer": "^2.12.1",
     "dotenv": "^16.4.7"

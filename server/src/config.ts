@@ -3,6 +3,10 @@ import { assert } from './utils.js';
 export const config = getConfig();
 
 export interface Config {
+  server: {
+    host: string;
+    port: number;
+  };
   database: {
     url: string;
     debug: boolean;
@@ -11,6 +15,10 @@ export interface Config {
 
 function getConfig(): Config {
   return {
+    server: {
+      host: getEnv('HOST'),
+      port: Number(getEnv('PORT')),
+    },
     database: {
       url: getEnv('DATABASE_URL'),
       debug: getEnv('DATABASE_DEBUG') === 'true',

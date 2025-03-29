@@ -1,6 +1,6 @@
 import { and, eq } from 'drizzle-orm';
 
-import * as dtos from '../dtos.js';
+import { emitDomainEvent } from '../events.js';
 import { db } from '../persistence/database.js';
 import {
   Product,
@@ -10,10 +10,9 @@ import {
   shoppingListItems,
 } from '../persistence/schema.js';
 import { createId, hasProperty } from '../utils.js';
-import { emitDomainEvent } from './events.js';
 import { getProduct } from './product.js';
 
-export async function listShoppingLists(filters?: { name?: string }): Promise<dtos.ShoppingList[]> {
+export async function listShoppingLists(filters?: { name?: string }) {
   let where = and();
 
   if (filters?.name !== undefined) {
@@ -32,7 +31,7 @@ export async function listShoppingLists(filters?: { name?: string }): Promise<dt
   });
 }
 
-export async function getShoppingList(listId: string): Promise<dtos.ShoppingList> {
+export async function getShoppingList(listId: string) {
   const list = await db.query.shoppingList.findFirst({
     where: eq(shoppingList.id, listId),
     with: {
@@ -46,18 +45,6 @@ export async function getShoppingList(listId: string): Promise<dtos.ShoppingList
 
   if (list === undefined) {
     throw new Error(`Cannot find shopping list "${listId}"`);
-  }
-
-  return list;
-}
-
-export async function findShoppingListByName(name: string) {
-  const list = await db.query.shoppingList.findFirst({
-    where: eq(shoppingList.name, name),
-  });
-
-  if (list === undefined) {
-    throw new Error(`Cannot find shopping list "${name}"`);
   }
 
   return list;
