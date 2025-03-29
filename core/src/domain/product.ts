@@ -4,11 +4,11 @@ import { db } from '../persistence/database';
 import { Unit, products } from '../persistence/schema';
 import { createId } from '../utils';
 
-export async function getProduct(name: string) {
-  const [product] = await db.select().from(products).where(eq(products.name, name));
+export async function getProduct(productId: string) {
+  const [product] = await db.select().from(products).where(eq(products.id, productId));
 
   if (product === undefined) {
-    throw new Error(`Cannot find product "${name}"`);
+    throw new Error(`Cannot find product "${productId}"`);
   }
 
   return product;
@@ -30,14 +30,24 @@ export async function createProduct(options: { name: string; unit: Unit }) {
   });
 }
 
-export async function updateProduct(name: string, options: Partial<{ name: string; unit: Unit }>) {
+export async function updateProduct(productId: string, options: Partial<{ name: string; unit: Unit }>) {
   await db
     .update(products)
     .set({
       name: options.name,
       unit: options.unit,
     })
-    .where(eq(products.name, name));
+    .where(eq(products.id, productId));
+}
+
+export async function findProductByName(name: string) {
+  const [product] = await db.select().from(products).where(eq(products.name, name));
+
+  if (product === undefined) {
+    throw new Error(`Cannot find product "${name}"`);
+  }
+
+  return product;
 }
 
 async function productExists(name: string) {

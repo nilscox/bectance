@@ -13,9 +13,9 @@ import { createId, hasProperty } from '../utils';
 import { emitDomainEvent } from './events';
 import { getProduct } from './product';
 
-export async function getShoppingList(name: string): Promise<dtos.ShoppingList> {
+export async function getShoppingList(listId: string): Promise<dtos.ShoppingList> {
   const list = await db.query.shoppingList.findFirst({
-    where: eq(shoppingList.name, name),
+    where: eq(shoppingList.id, listId),
     with: {
       items: {
         with: {
@@ -23,6 +23,18 @@ export async function getShoppingList(name: string): Promise<dtos.ShoppingList> 
         },
       },
     },
+  });
+
+  if (list === undefined) {
+    throw new Error(`Cannot find shopping list "${listId}"`);
+  }
+
+  return list;
+}
+
+export async function findShoppingListByName(name: string) {
+  const list = await db.query.shoppingList.findFirst({
+    where: eq(shoppingList.name, name),
   });
 
   if (list === undefined) {
@@ -40,12 +52,12 @@ export async function createShoppingList(shoppingListName: string) {
 }
 
 export async function upsertShoppingListItem(
-  shoppingListName: string,
-  productName: string,
+  shoppingListId: string,
+  productId: string,
   options: Partial<{ quantity: number | false; checked: boolean }>,
 ) {
-  const list = await getShoppingList(shoppingListName);
-  const product = await getProduct(productName);
+  const list = await getShoppingList(shoppingListId);
+  const product = await getProduct(productId);
   const item = list.items.find(hasProperty('productId', product.id));
 
   if (item) {

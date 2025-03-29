@@ -5,6 +5,8 @@ import {
   closeDatabaseConnection,
   createProduct,
   createShoppingList,
+  findProductByName,
+  findShoppingListByName,
   getShoppingList,
   getStock,
   toObject,
@@ -27,7 +29,7 @@ product
 product
   .command('product update')
   .description('Update an existing product')
-  .argument('[name]', 'Name of the product')
+  .argument('[name]', 'Name of the product', parseProductName)
   .option('--name <name>', 'Name of the product')
   .option('--unit <unit>', 'Unit of the product', parseUnit)
   .action(updateProduct);
@@ -49,7 +51,7 @@ stock
 stock
   .command('update')
   .description('Update the current stock')
-  .argument('<product>', 'Name of the product')
+  .argument('<product>', 'Name of the product', parseProductName)
   .argument('<quantity>', 'Quantity to set', parsePositiveInteger)
   .action(upsertStock);
 
@@ -58,9 +60,9 @@ const list = new Command('list');
 list
   .command('get')
   .description('Print a shopping list')
-  .argument('<name>', 'Name of the shopping list')
-  .action(async (name) => {
-    const list = await getShoppingList(name);
+  .argument('<name>', 'Name of the shopping list', parseShoppingListName)
+  .action(async (id) => {
+    const list = await getShoppingList(id);
 
     printTable(
       ['Product', 'Qty', 'Checked'],
@@ -81,8 +83,8 @@ list
 list
   .command('item')
   .description('Create or update an item from a shopping list')
-  .argument('<list>', 'Name of the shopping list')
-  .argument('<product>', 'Name of the product')
+  .argument('<list>', 'Name of the shopping list', parseShoppingListName)
+  .argument('<product>', 'Name of the product', parseProductName)
   .option('--quantity <value>', 'Set the quantity', parsePositiveInteger)
   .option('--no-quantity', 'Remove the quantity')
   .option('--checked', 'Mark the product as checked')
@@ -94,6 +96,10 @@ const program = new Command();
 program.addCommand(product);
 program.addCommand(stock);
 program.addCommand(list);
+
+program.hook('preAction', async function (_, action) {
+  action.processedArgs = await Promise.all(action.processedArgs);
+});
 
 program.hook('postAction', () => closeDatabaseConnection());
 
@@ -125,6 +131,18 @@ function parseUnit(value: string) {
   }
 
   return value;
+}
+
+async function parseShoppingListName(name: string) {
+  const list = await findShoppingListByName(name);
+
+  return list.id;
+}
+
+async function parseProductName(name: string) {
+  const product = await findProductByName(name);
+
+  return product.id;
 }
 
 export function formatUnit(quantity: number, unit: Unit) {

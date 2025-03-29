@@ -30,8 +30,8 @@ product.get('/', async (req, res) => {
   res.json(await listProducts());
 });
 
-product.get('/:name', async (req, res) => {
-  res.json(await getProduct(req.params.name));
+product.get('/:productId', async (req, res) => {
+  res.json(await getProduct(req.params.productId));
 });
 
 const createProductBody = z.object({
@@ -46,8 +46,8 @@ product.post('/', validateRequestBody(createProductBody), async (req, res) => {
 
 const updateProductBody = createProductBody.partial();
 
-product.put('/:name', validateRequestBody(updateProductBody), async (req, res) => {
-  await updateProduct(req.params.name, req.body);
+product.put('/:productId', validateRequestBody(updateProductBody), async (req, res) => {
+  await updateProduct(req.params.productId, req.body);
   res.end();
 });
 
@@ -61,18 +61,18 @@ const updateStockBody = z.object({
   quantity: z.number().min(0),
 });
 
-stock.put('/:name', validateRequestBody(updateStockBody), async (req, res) => {
-  await upsertStock(req.params.name, req.body.quantity);
+stock.put('/:productId', validateRequestBody(updateStockBody), async (req, res) => {
+  await upsertStock(req.params.productId, req.body.quantity);
   res.end();
 });
 
 // shopping list
 
-shoppingList.get('/:list', async (req, res) => {
-  res.json(await getShoppingList(req.params.list));
+shoppingList.get('/:listId', async (req, res) => {
+  res.json(await getShoppingList(req.params.listId));
 });
 
-shoppingList.get('/:list/events', (req, res) => {
+shoppingList.get('/:listId/events', (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
@@ -113,6 +113,6 @@ const upsertShoppingListItemBody = z
   })
   .partial();
 
-shoppingList.put('/:list/:product', validateRequestBody(upsertShoppingListItemBody), async (req, res) => {
-  res.json(await upsertShoppingListItem(req.params.list, req.params.product, req.body));
+shoppingList.put('/:listId/:productId', validateRequestBody(upsertShoppingListItemBody), async (req, res) => {
+  res.json(await upsertShoppingListItem(req.params.listId, req.params.productId, req.body));
 });

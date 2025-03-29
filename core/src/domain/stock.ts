@@ -11,8 +11,8 @@ export async function getStock() {
   });
 }
 
-export async function upsertStock(productName: string, quantity: number) {
-  const product = await getProduct(productName);
+export async function upsertStock(productId: string, quantity: number) {
+  const product = await getProduct(productId);
   const stock = await findStock(product.id);
 
   if (stock) {
