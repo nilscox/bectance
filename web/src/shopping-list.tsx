@@ -1,17 +1,18 @@
 import type { ShoppingList } from '@boubouffe/core';
-import { For, createResource, onCleanup, onMount } from 'solid-js';
+import { createQuery, useQueryClient } from '@tanstack/solid-query';
+import { For, onCleanup, onMount } from 'solid-js';
 
 import { Checkbox } from './components/checkbox';
 
 export function ShoppingList(props: { listId: string }) {
-  const [list, { onItemChecked }] = useShoppingList(() => props.listId);
+  const [getList, { onItemChecked }] = useShoppingList(() => props.listId);
 
   return (
     <div class="p-4 flex flex-col gap-4">
-      <div class="text-3xl">{list.latest?.name}</div>
+      <div class="text-3xl">{getList()?.name}</div>
 
       <ul class="space-y-2">
-        <For each={list.latest?.items}>
+        <For each={getList()?.items}>
           {(item) => (
             <li>
               <Checkbox
@@ -28,15 +29,19 @@ export function ShoppingList(props: { listId: string }) {
 }
 
 function useShoppingList(getListId: () => string) {
-  const [list, { mutate }] = createResource(getListId, getShoppingList);
+  const queryClient = useQueryClient();
+  const query = createQuery(() => ({
+    queryKey: ['getList', getListId()],
+    queryFn: () => getShoppingList(getListId()),
+  }));
 
   const setItemChecked = (productId: string, checked: boolean) => {
-    mutate((prev) => {
+    queryClient.setQueryData(['getList', getListId()], (prev: ShoppingList | undefined) => {
       if (!prev) {
         return prev;
       }
 
-      const index = prev?.items.findIndex((item) => item.id === productId);
+      const index = prev.items.findIndex((item) => item.id === productId);
 
       if (index < 0) {
         return prev;
@@ -75,7 +80,7 @@ function useShoppingList(getListId: () => string) {
     });
   });
 
-  return [list, { onItemChecked }] as const;
+  return [() => query.data, { onItemChecked }] as const;
 }
 
 async function getShoppingList(listId: string) {
