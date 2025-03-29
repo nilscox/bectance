@@ -1,4 +1,4 @@
-import * as schema from './persistence/schema';
+import * as schema from './persistence/schema.js';
 
 export type Stock = schema.Stock & {
   product: schema.Product;

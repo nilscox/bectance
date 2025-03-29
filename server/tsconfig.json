@@ -1,9 +1,10 @@
 {
-  "include": [
-    "./src/**/*"
-  ],
+  "include": ["./src/**/*"],
+  "references": [{ "path": "../core" }],
   "compilerOptions": {
-    "noEmit": true,
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "outDir": "./dist",
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "strict": true

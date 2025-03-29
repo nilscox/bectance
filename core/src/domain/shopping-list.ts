@@ -1,17 +1,17 @@
 import { and, eq } from 'drizzle-orm';
 
-import * as dtos from '../dtos';
-import { db } from '../persistence/database';
+import * as dtos from '../dtos.js';
+import { db } from '../persistence/database.js';
 import {
   Product,
   ShoppingList,
   ShoppingListItem,
   shoppingList,
   shoppingListItems,
-} from '../persistence/schema';
-import { createId, hasProperty } from '../utils';
-import { emitDomainEvent } from './events';
-import { getProduct } from './product';
+} from '../persistence/schema.js';
+import { createId, hasProperty } from '../utils.js';
+import { emitDomainEvent } from './events.js';
+import { getProduct } from './product.js';
 
 export async function listShoppingLists(filters?: { name?: string }): Promise<dtos.ShoppingList[]> {
   let where = and();

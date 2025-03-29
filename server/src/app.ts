@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { routes } from './routes';
+import { routes } from './routes.js';
 
 export const app = express();
 

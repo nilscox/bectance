@@ -1,10 +1,10 @@
 import { eq } from 'drizzle-orm';
 
-import * as dtos from '../dtos';
-import { db } from '../persistence/database';
-import { stocks } from '../persistence/schema';
-import { createId } from '../utils';
-import { getProduct } from './product';
+import * as dtos from '../dtos.js';
+import { db } from '../persistence/database.js';
+import { stocks } from '../persistence/schema.js';
+import { createId } from '../utils.js';
+import { getProduct } from './product.js';
 
 export async function getStock(): Promise<dtos.Stock[]> {
   return db.query.stocks.findMany({

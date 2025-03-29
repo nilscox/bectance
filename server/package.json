@@ -5,9 +5,9 @@
   "scripts": {
     "lint": "eslint src",
     "format": "prettier --check src",
-    "typecheck": "tsc",
-    "start": "tsx ./src/index.ts",
-    "dev": "nodemon -w .env -w src -e ts -x 'pnpm start'"
+    "build": "tsc --build",
+    "start": "node ./dist/index.js",
+    "dev": "nodemon -w .env -w src -e ts -x 'tsx ./src/index.ts'"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",

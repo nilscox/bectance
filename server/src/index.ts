@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 import { addDomainEventListener } from '@boubouffe/core';
 
-import { app } from './app';
+import { app } from './app.js';
 
 const host = process.env.HOST ?? 'localhost';
 const port = Number(process.env.PORT ?? '8000');
@@ -25,5 +25,5 @@ function closeServer(signal: string) {
 const events = ['shoppingListItemCreated', 'shoppingListItemUpdated'] as const;
 
 for (const event of events) {
-  addDomainEventListener(event, (payload) => console.log(event, payload));
+  addDomainEventListener(event, (payload: unknown) => console.log(event, payload));
 }

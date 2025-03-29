@@ -6,11 +6,11 @@ import {
   getShoppingList,
   getStock,
   listProducts,
+  listShoppingLists,
   updateProduct,
   upsertShoppingListItem,
   upsertStock,
 } from '@boubouffe/core';
-import { listShoppingLists } from '@boubouffe/core/src/domain/shopping-list';
 import express, { Request } from 'express';
 import { z } from 'zod';
 import { validateRequestBody } from 'zod-express-middleware';
@@ -96,7 +96,7 @@ shoppingList.get('/:listId/events', (req, res) => {
   const events = ['shoppingListItemCreated', 'shoppingListItemUpdated'] as const;
 
   const subscriptions = events.map((event) => {
-    return addDomainEventListener(event, (payload) => handleEvent(event, payload));
+    return addDomainEventListener(event, (payload: unknown) => handleEvent(event, payload));
   });
 
   console.debug('Client connected to shopping list event stream');

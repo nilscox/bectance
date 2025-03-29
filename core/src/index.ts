@@ -1,14 +1,21 @@
-export { toObject } from './utils';
-export { addDomainEventListener } from './domain/events';
-export { createProduct, getProduct, listProducts, updateProduct, findProductByName } from './domain/product';
+export { addDomainEventListener } from './domain/events.js';
+export {
+  createProduct,
+  findProductByName,
+  getProduct,
+  listProducts,
+  updateProduct,
+} from './domain/product.js';
 export {
   createShoppingList,
   createShoppingListItem,
-  getShoppingList,
   findShoppingListByName,
+  getShoppingList,
+  listShoppingLists,
   updateShoppingListItem,
   upsertShoppingListItem,
-} from './domain/shopping-list';
-export { getStock, upsertStock } from './domain/stock';
-export { closeDatabaseConnection } from './persistence/database';
-export * from './dtos';
+} from './domain/shopping-list.js';
+export { getStock, upsertStock } from './domain/stock.js';
+export * from './dtos.js';
+export { closeDatabaseConnection } from './persistence/database.js';
+export { toObject } from './utils.js';
