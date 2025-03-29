@@ -1,8 +1,9 @@
 import { and, eq } from 'drizzle-orm';
 
+import { BadRequestError, NotFoundError } from '../errors.js';
 import { db } from '../persistence/database.js';
 import { Unit, products } from '../persistence/schema.js';
-import { createId } from '../utils.js';
+import { createId, defined } from '../utils.js';
 
 export async function listProducts(filters?: { name?: string }) {
   let where = and();
@@ -17,16 +18,12 @@ export async function listProducts(filters?: { name?: string }) {
 export async function getProduct(productId: string) {
   const [product] = await db.select().from(products).where(eq(products.id, productId));
 
-  if (product === undefined) {
-    throw new Error(`Cannot find product "${productId}"`);
-  }
-
-  return product;
+  return defined(product, new NotFoundError('Cannot find product', { id: productId }));
 }
 
 export async function createProduct(options: { name: string; unit: Unit }) {
   if (await productExists(options.name)) {
-    throw new Error(`Product "${options.name}" already exists`);
+    throw new BadRequestError('Product already exists', { name: options.name });
   }
 
   await db.insert(products).values({
@@ -44,16 +41,6 @@ export async function updateProduct(productId: string, options: Partial<{ name: 
       unit: options.unit,
     })
     .where(eq(products.id, productId));
-}
-
-export async function findProductByName(name: string) {
-  const [product] = await db.select().from(products).where(eq(products.name, name));
-
-  if (product === undefined) {
-    throw new Error(`Cannot find product "${name}"`);
-  }
-
-  return product;
 }
 
 async function productExists(name: string) {

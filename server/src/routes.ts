@@ -13,6 +13,7 @@ import {
 import { getStock, upsertStock } from './domain/stock.js';
 import { addDomainEventListener } from './events.js';
 import { Product, ShoppingList, ShoppingListItem, Stock } from './persistence/schema.js';
+import { assert } from './utils.js';
 
 export const routes = express.Router();
 
@@ -65,7 +66,10 @@ product.post('/', validateRequestBody(createProductBody), async (req, res) => {
 const updateProductBody = createProductBody.partial();
 
 product.put('/:productId', validateRequestBody(updateProductBody), async (req, res) => {
+  assert(req.params.productId);
+
   await updateProduct(req.params.productId, req.body);
+
   res.end();
 });
 
@@ -89,7 +93,10 @@ const updateStockBody = z.object({
 });
 
 stock.put('/:productId', validateRequestBody(updateStockBody), async (req, res) => {
+  assert(req.params.productId);
+
   await upsertStock(req.params.productId, req.body.quantity);
+
   res.end();
 });
 
@@ -166,5 +173,8 @@ const upsertShoppingListItemBody = z
   .partial();
 
 shoppingList.put('/:listId/:productId', validateRequestBody(upsertShoppingListItemBody), async (req, res) => {
+  assert(req.params.listId);
+  assert(req.params.productId);
+
   res.json(await upsertShoppingListItem(req.params.listId, req.params.productId, req.body));
 });

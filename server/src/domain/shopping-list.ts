@@ -1,5 +1,6 @@
 import { and, eq } from 'drizzle-orm';
 
+import { NotFoundError } from '../errors.js';
 import { emitDomainEvent } from '../events.js';
 import { db } from '../persistence/database.js';
 import {
@@ -9,7 +10,7 @@ import {
   shoppingList,
   shoppingListItems,
 } from '../persistence/schema.js';
-import { createId, hasProperty } from '../utils.js';
+import { createId, defined, hasProperty } from '../utils.js';
 import { getProduct } from './product.js';
 
 export async function listShoppingLists(filters?: { name?: string }) {
@@ -43,11 +44,7 @@ export async function getShoppingList(listId: string) {
     },
   });
 
-  if (list === undefined) {
-    throw new Error(`Cannot find shopping list "${listId}"`);
-  }
-
-  return list;
+  return defined(list, new NotFoundError('Cannot find shopping list', { id: listId }));
 }
 
 export async function createShoppingList(shoppingListName: string) {
