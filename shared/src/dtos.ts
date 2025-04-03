@@ -30,7 +30,7 @@ export type DomainEvents = {
     id: string;
     shoppingListId: string;
     productId: string;
-    quantity: number | undefined;
+    quantity: number | null;
     checked: boolean;
   };
 

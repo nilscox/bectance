@@ -11,7 +11,7 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.15",
     "@tanstack/eslint-plugin-query": "^5.68.0",
-    "solid-devtools": "^0.33.0",
+    "solid-devtools": "^0.34.0",
     "tailwindcss": "^4.0.15",
     "typescript": "^5.8.2",
     "vite": "^6.2.2",
@@ -21,7 +21,6 @@
     "@ark-ui/solid": "^5.2.0",
     "@boubouffe/shared": "workspace:^",
     "@tanstack/solid-query": "^5.70.0",
-    "immer": "^10.1.1",
     "lucide-solid": "^0.483.0",
     "solid-js": "^1.9.5"
   }

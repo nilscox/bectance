@@ -1,16 +1,18 @@
-import type { DomainEvents, ShoppingList, ShoppingListItem } from '@boubouffe/shared/dtos';
-import { assert } from '@boubouffe/shared/utils';
+import type { DomainEvents, Product, ShoppingList, ShoppingListItem } from '@boubouffe/shared/dtos';
+import { assert, hasProperty } from '@boubouffe/shared/utils';
 import { createQuery, useQueryClient } from '@tanstack/solid-query';
-import { produce } from 'immer';
 import { For, onCleanup, onMount } from 'solid-js';
+import { produce } from 'solid-js/store';
 
 import { Checkbox } from './components/checkbox';
+import { Combobox } from './components/combobox';
 
 export function ShoppingList(props: { listId: string }) {
-  const [getList, { onItemChecked }] = useShoppingList(() => props.listId);
+  const [getProducts] = useProductList();
+  const [getList, { onItemAdded, onItemChecked }] = useShoppingList(() => props.listId);
 
   return (
-    <div class="p-4 flex flex-col gap-4">
+    <div class="p-4 col gap-4">
       <div class="text-3xl">{getList()?.name}</div>
 
       <ul class="space-y-2">
@@ -25,9 +27,36 @@ export function ShoppingList(props: { listId: string }) {
             </li>
           )}
         </For>
+
+        <li>
+          <Combobox
+            items={getProducts() ?? []}
+            filter={(product, inputValue) => product.name.toLowerCase().includes(inputValue.toLowerCase())}
+            itemToString={(product) => product.name}
+            renderItem={(product) => product.name}
+            onValueChange={(product) => onItemAdded(product.id)}
+          />
+        </li>
       </ul>
     </div>
   );
+}
+
+function useProductList() {
+  const query = createQuery(() => ({
+    queryKey: ['listProducts'],
+    queryFn: () => listProducts(),
+  }));
+
+  return [() => query.data];
+}
+
+async function listProducts() {
+  const response = await fetch('/api/product');
+
+  if (response.ok) {
+    return response.json() as Promise<Product[]>;
+  }
 }
 
 function useShoppingList(getListId: () => string) {
@@ -38,23 +67,29 @@ function useShoppingList(getListId: () => string) {
     queryFn: () => getShoppingList(getListId()),
   }));
 
-  const updateItem = (productId: string, updater: (item: ShoppingListItem) => void) => {
+  const updateList = (updater: (list: ShoppingList) => void) => {
     queryClient.setQueryData(['getList', getListId()], (list: ShoppingList | undefined) => {
-      return produce(list, (list) => {
-        if (!list) {
-          return list;
-        }
-
-        const item = list.items.find((item) => item.id === productId);
-
-        assert(item);
-        updater(item);
-      });
+      if (list) {
+        return produce(updater)(list);
+      }
     });
   };
 
+  const updateItem = (productId: string, updater: (item: ShoppingListItem) => void) => {
+    updateList((list) => {
+      const item = list.items.find((item) => item.id === productId);
+
+      assert(item);
+      updater(item);
+    });
+  };
+
+  const onItemAdded = async (productId: string) => {
+    await upsertShoppingListItem(getListId(), productId);
+  };
+
   const onItemChecked = async (productId: string, checked: boolean) => {
-    await checkShoppingListItem(getListId(), productId, checked);
+    await upsertShoppingListItem(getListId(), productId, { checked });
   };
 
   onMount(() => {
@@ -68,6 +103,26 @@ function useShoppingList(getListId: () => string) {
       });
     });
 
+    eventSource.addEventListener('shoppingListItemCreated', (event) => {
+      const data: DomainEvents['shoppingListItemCreated'] = JSON.parse(event.data);
+
+      const products = queryClient.getQueryData<Product[]>(['listProducts']);
+      const product = products?.find(hasProperty('id', data.productId));
+
+      if (!product) {
+        return;
+      }
+
+      updateList((list) => {
+        list.items.push({
+          id: data.id,
+          product,
+          checked: data.checked,
+          quantity: data.quantity,
+        });
+      });
+    });
+
     eventSource.onerror = (err) => {
       console.error('EventSource failed:', err);
     };
@@ -77,7 +132,7 @@ function useShoppingList(getListId: () => string) {
     });
   });
 
-  return [() => query.data, { onItemChecked }] as const;
+  return [() => query.data, { onItemAdded, onItemChecked }] as const;
 }
 
 async function getShoppingList(listId: string) {
@@ -88,10 +143,14 @@ async function getShoppingList(listId: string) {
   }
 }
 
-async function checkShoppingListItem(listId: string, productId: string, checked: boolean) {
+async function upsertShoppingListItem(
+  listId: string,
+  productId: string,
+  body: Partial<{ checked: boolean; quantity: boolean }> = {},
+) {
   await fetch(`/api/shopping-list/${listId}/${productId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ checked }),
+    body: JSON.stringify(body),
   });
 }

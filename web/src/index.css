@@ -1,1 +1,17 @@
 @import 'tailwindcss';
+
+@layer base {
+  * {
+    border: var(--color-slate-400);
+  }
+}
+
+@utility row {
+  display: flex;
+  flex-direction: row;
+}
+
+@utility col {
+  display: flex;
+  flex-direction: column;
+}

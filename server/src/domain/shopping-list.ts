@@ -79,7 +79,7 @@ export async function createShoppingListItem(
     id: createId(),
     shoppingListId: list.id,
     productId: product.id,
-    quantity: options.quantity || undefined,
+    quantity: options.quantity || null,
     checked: options.checked ?? false,
   };
 

@@ -7,6 +7,7 @@ export default [
   {
     rules: {
       '@typescript-eslint/consistent-type-definitions': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', ignoreRestSiblings: true }],
     },
   },
 ];
