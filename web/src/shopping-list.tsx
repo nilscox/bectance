@@ -1,5 +1,7 @@
-import type { DomainEvents, ShoppingList } from '@boubouffe/shared/dtos';
+import type { DomainEvents, ShoppingList, ShoppingListItem } from '@boubouffe/shared/dtos';
+import { assert } from '@boubouffe/shared/utils';
 import { createQuery, useQueryClient } from '@tanstack/solid-query';
+import { produce } from 'immer';
 import { For, onCleanup, onMount } from 'solid-js';
 
 import { Checkbox } from './components/checkbox';
@@ -30,31 +32,24 @@ export function ShoppingList(props: { listId: string }) {
 
 function useShoppingList(getListId: () => string) {
   const queryClient = useQueryClient();
+
   const query = createQuery(() => ({
     queryKey: ['getList', getListId()],
     queryFn: () => getShoppingList(getListId()),
   }));
 
-  const setItemChecked = (productId: string, checked: boolean) => {
-    queryClient.setQueryData(['getList', getListId()], (prev: ShoppingList | undefined) => {
-      if (!prev) {
-        return prev;
-      }
+  const updateItem = (productId: string, updater: (item: ShoppingListItem) => void) => {
+    queryClient.setQueryData(['getList', getListId()], (list: ShoppingList | undefined) => {
+      return produce(list, (list) => {
+        if (!list) {
+          return list;
+        }
 
-      const index = prev.items.findIndex((item) => item.id === productId);
+        const item = list.items.find((item) => item.id === productId);
 
-      if (index < 0) {
-        return prev;
-      }
-
-      return {
-        ...prev,
-        items: [
-          ...prev.items.slice(0, index),
-          { ...prev.items[index], checked },
-          ...prev.items.slice(index + 1),
-        ],
-      };
+        assert(item);
+        updater(item);
+      });
     });
   };
 
@@ -66,11 +61,11 @@ function useShoppingList(getListId: () => string) {
     const eventSource = new EventSource(`/api/shopping-list/${getListId()}/events`);
 
     eventSource.addEventListener('shoppingListItemUpdated', (event) => {
-      const data: DomainEvents['shoppingListItemUpdated'] = JSON.parse(event.data);
+      const { id, ...data }: DomainEvents['shoppingListItemUpdated'] = JSON.parse(event.data);
 
-      if (data.checked !== undefined) {
-        setItemChecked(data.id, data.checked);
-      }
+      updateItem(id, (item) => {
+        Object.assign(item, data);
+      });
     });
 
     eventSource.onerror = (err) => {

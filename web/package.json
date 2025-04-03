@@ -21,6 +21,7 @@
     "@ark-ui/solid": "^5.2.0",
     "@boubouffe/shared": "workspace:^",
     "@tanstack/solid-query": "^5.70.0",
+    "immer": "^10.1.1",
     "lucide-solid": "^0.483.0",
     "solid-js": "^1.9.5"
   }

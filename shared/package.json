@@ -2,15 +2,15 @@
   "name": "@boubouffe/shared",
   "type": "module",
   "exports": {
-    "dtos": "./dist/dtos.js",
-    "utils": "./dist/utils.js"
+    "./dtos": "./dist/dtos.js",
+    "./utils": "./dist/utils.js"
   },
   "typesVersions": {
     "*": {
-      "dtos": [
+      "./dtos": [
         "./dist/dtos.d.ts"
       ],
-      "utils": [
+      "./utils": [
         "./dist/utils.d.ts"
       ]
     }
@@ -20,5 +20,8 @@
   },
   "devDependencies": {
     "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "remeda": "^2.21.2"
   }
 }
