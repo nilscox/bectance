@@ -6,6 +6,7 @@ import { validateRequestBody } from 'zod-express-middleware';
 import { createProduct, getProduct, listProducts, updateProduct } from './domain/product.js';
 import {
   createShoppingList,
+  deleteShoppingListItem,
   getShoppingList,
   listShoppingLists,
   upsertShoppingListItem,
@@ -141,7 +142,7 @@ shoppingList.get('/:listId/events', (req, res) => {
     res.write(`data: ${JSON.stringify(data)}\n\n`);
   };
 
-  const events = ['shoppingListItemCreated', 'shoppingListItemUpdated'] as const;
+  const events = ['shoppingListItemCreated', 'shoppingListItemUpdated', 'shoppingListItemDeleted'] as const;
 
   const subscriptions = events.map((event) => {
     return addDomainEventListener(event, (payload: unknown) => handleEvent(event, payload));
@@ -177,4 +178,11 @@ shoppingList.put('/:listId/:productId', validateRequestBody(upsertShoppingListIt
   assert(req.params.productId);
 
   res.json(await upsertShoppingListItem(req.params.listId, req.params.productId, req.body));
+});
+
+shoppingList.delete('/:listId/:itemId', async (req, res) => {
+  assert(req.params.listId);
+  assert(req.params.itemId);
+
+  res.json(await deleteShoppingListItem(req.params.listId, req.params.itemId));
 });

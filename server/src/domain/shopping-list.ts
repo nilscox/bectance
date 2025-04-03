@@ -121,3 +121,9 @@ export async function updateShoppingListItem(
 
   emitDomainEvent('shoppingListItemUpdated', { id: item.id, ...values });
 }
+
+export async function deleteShoppingListItem(shoppingListId: string, itemId: string) {
+  await db.delete(shoppingListItems).where(eq(shoppingListItems.id, itemId));
+
+  emitDomainEvent('shoppingListItemDeleted', { id: itemId });
+}

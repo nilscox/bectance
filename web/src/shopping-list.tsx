@@ -1,30 +1,33 @@
 import type { DomainEvents, Product, ShoppingList, ShoppingListItem } from '@boubouffe/shared/dtos';
 import { assert, hasProperty } from '@boubouffe/shared/utils';
 import { createQuery, useQueryClient } from '@tanstack/solid-query';
-import { For, onCleanup, onMount } from 'solid-js';
+import { Trash2Icon, XIcon } from 'lucide-solid';
+import { For, Show, createSignal, onCleanup, onMount } from 'solid-js';
 import { produce } from 'solid-js/store';
 
 import { Checkbox } from './components/checkbox';
 import { Combobox } from './components/combobox';
+import { useLongPress } from './utils/long-press';
 
 export function ShoppingList(props: { listId: string }) {
   const [getProducts] = useProductList();
-  const [getList, { onItemAdded, onItemChecked }] = useShoppingList(() => props.listId);
+  const [getList, { onItemAdded, onItemChecked, onItemDeleted }] = useShoppingList(() => props.listId);
+  const [showActions, setShowActions] = createSignal<ShoppingListItem>();
 
   return (
     <div class="p-4 col gap-4">
       <div class="text-3xl">{getList()?.name}</div>
 
-      <ul class="space-y-2">
+      <ul>
         <For each={getList()?.items}>
           {(item) => (
-            <li>
-              <Checkbox
-                label={item.product.name}
-                checked={item.checked}
-                onChange={(checked) => onItemChecked(item.product.id, checked)}
-              />
-            </li>
+            <ShoppingListItem
+              item={item}
+              showActions={showActions() === item}
+              onShowActions={(show: boolean) => setShowActions(show ? item : undefined)}
+              onChecked={(checked) => onItemChecked(item.product.id, checked)}
+              onDeleted={() => onItemDeleted(item.id)}
+            />
           )}
         </For>
 
@@ -39,6 +42,44 @@ export function ShoppingList(props: { listId: string }) {
         </li>
       </ul>
     </div>
+  );
+}
+
+function ShoppingListItem(props: {
+  item: ShoppingListItem;
+  showActions: boolean;
+  onShowActions: (show: boolean) => void;
+  onChecked: (checked: boolean) => void;
+  onDeleted: () => void;
+}) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const longPress = useLongPress(200);
+
+  return (
+    <li
+      use:longPress={() => props.onShowActions(!props.showActions)}
+      class="row gap-4 items-center py-0.5 px-1 rounded"
+      classList={{ 'bg-slate-100': props.showActions }}
+    >
+      <Checkbox
+        label={props.item.product.name}
+        checked={props.item.checked}
+        onChange={(checked) => props.onChecked(checked)}
+        class="w-full"
+      />
+
+      <Show when={props.showActions}>
+        <div class="row gap-2 items-center">
+          <button type="button" onClick={() => props.onDeleted()}>
+            <Trash2Icon class="size-4" />
+          </button>
+
+          <button type="button" onClick={() => props.onShowActions(false)}>
+            <XIcon class="size-4" />
+          </button>
+        </div>
+      </Show>
+    </li>
   );
 }
 
@@ -92,6 +133,10 @@ function useShoppingList(getListId: () => string) {
     await upsertShoppingListItem(getListId(), productId, { checked });
   };
 
+  const onItemDeleted = async (productId: string) => {
+    await deleteShoppingListItem(getListId(), productId);
+  };
+
   onMount(() => {
     const eventSource = new EventSource(`/api/shopping-list/${getListId()}/events`);
 
@@ -123,6 +168,18 @@ function useShoppingList(getListId: () => string) {
       });
     });
 
+    eventSource.addEventListener('shoppingListItemDeleted', (event) => {
+      const data: DomainEvents['shoppingListItemDeleted'] = JSON.parse(event.data);
+
+      updateList((list) => {
+        const index = list.items.findIndex(hasProperty('id', data.id));
+
+        if (index >= 0) {
+          list.items = [...list.items.slice(0, index), ...list.items.slice(index + 1)];
+        }
+      });
+    });
+
     eventSource.onerror = (err) => {
       console.error('EventSource failed:', err);
     };
@@ -132,7 +189,7 @@ function useShoppingList(getListId: () => string) {
     });
   });
 
-  return [() => query.data, { onItemAdded, onItemChecked }] as const;
+  return [() => query.data, { onItemAdded, onItemChecked, onItemDeleted }] as const;
 }
 
 async function getShoppingList(listId: string) {
@@ -152,5 +209,11 @@ async function upsertShoppingListItem(
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
+  });
+}
+
+async function deleteShoppingListItem(listId: string, itemId: string) {
+  await fetch(`/api/shopping-list/${listId}/${itemId}`, {
+    method: 'DELETE',
   });
 }
