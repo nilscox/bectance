@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+@theme {
+  --spacing-em: 1em;
+}
+
 @layer base {
   * {
     border: var(--color-slate-400);
