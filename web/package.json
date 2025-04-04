@@ -20,6 +20,8 @@
   "dependencies": {
     "@ark-ui/solid": "^5.2.0",
     "@boubouffe/shared": "workspace:^",
+    "@fontsource-variable/open-sans": "^5.2.5",
+    "@solidjs/router": "^0.15.3",
     "@tanstack/solid-query": "^5.70.0",
     "clsx": "^2.1.1",
     "lucide-solid": "^0.483.0",

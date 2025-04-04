@@ -1,13 +1,12 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
+import { Route, Router } from '@solidjs/router';
 
 import { ShoppingList } from './shopping-list';
 
-const queryClient = new QueryClient();
-
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ShoppingList listId="" />
-    </QueryClientProvider>
+    <Router>
+      <Route path="/" />
+      <Route path="/list/:listId" component={ShoppingList} />
+    </Router>
   );
 }

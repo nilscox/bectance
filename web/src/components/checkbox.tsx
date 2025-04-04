@@ -6,14 +6,17 @@ import { JSX } from 'solid-js';
 export function Checkbox(props: {
   label?: JSX.Element;
   disabled?: boolean;
+  readOnly?: boolean;
   checked?: boolean;
   onChange?: (checked: boolean) => void;
   class?: string;
+  classes?: Partial<Record<'label', string>>;
 }) {
   return (
     <ArkCheckbox.Root
       checked={props.checked}
       disabled={props.disabled}
+      readOnly={props.readOnly}
       onCheckedChange={(event) => props.onChange?.(Boolean(event.checked))}
       class={clsx('inline-flex flex-row items-center gap-2 group', props.class)}
     >
@@ -25,7 +28,7 @@ export function Checkbox(props: {
 
       <ArkCheckbox.HiddenInput />
 
-      <ArkCheckbox.Label>{props.label}</ArkCheckbox.Label>
+      <ArkCheckbox.Label class={props.classes?.label}>{props.label}</ArkCheckbox.Label>
     </ArkCheckbox.Root>
   );
 }

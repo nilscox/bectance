@@ -2,11 +2,13 @@
 
 @theme {
   --spacing-em: 1em;
+  --font-sans: 'Open Sans Variable', sans-serif;
+  --color-dim: var(--color-neutral-600);
 }
 
 @layer base {
   * {
-    border: var(--color-slate-400);
+    border: var(--color-zinc-400);
   }
 }
 

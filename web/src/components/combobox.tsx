@@ -5,12 +5,14 @@ import {
   ComboboxValueChangeDetails,
   createListCollection,
 } from '@ark-ui/solid';
+import clsx from 'clsx';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon, XIcon } from 'lucide-solid';
 import { For, JSX, Show, createEffect, createMemo, createSignal } from 'solid-js';
 import { Portal } from 'solid-js/web';
 
 type ComboboxProps<T> = {
   label?: JSX.Element;
+  placeholder?: string;
   helperText?: JSX.Element;
   errorText?: JSX.Element;
   items: T[];
@@ -63,7 +65,7 @@ export function Combobox<T>(props: ComboboxProps<T>) {
         </Show>
 
         <ArkCombobox.Control class="px-2 py-1 border rounded inline-flex flex-row items-center">
-          <ArkCombobox.Input class="outline-none" />
+          <ArkCombobox.Input placeholder={props.placeholder} class="outline-none" />
 
           <ArkCombobox.ClearTrigger>
             <XIcon class="size-4" />
@@ -75,25 +77,7 @@ export function Combobox<T>(props: ComboboxProps<T>) {
           </ArkCombobox.Trigger>
         </ArkCombobox.Control>
 
-        <Portal>
-          <ArkCombobox.Positioner>
-            <ArkCombobox.Content class="bg-slate-100 border shadow rounded p-2">
-              <For each={collection().items}>
-                {(item) => (
-                  <ArkCombobox.Item item={item} class="row justify-between items-center">
-                    <ArkCombobox.ItemText class="data-highlighted:font-semibold">
-                      {item.label}
-                    </ArkCombobox.ItemText>
-
-                    <ArkCombobox.ItemIndicator>
-                      <CheckIcon class="size-4" />
-                    </ArkCombobox.ItemIndicator>
-                  </ArkCombobox.Item>
-                )}
-              </For>
-            </ArkCombobox.Content>
-          </ArkCombobox.Positioner>
-        </Portal>
+        <Combobox.Dropdown items={collection().items} />
       </ArkCombobox.Root>
 
       <Show when={props.helperText}>
@@ -106,3 +90,32 @@ export function Combobox<T>(props: ComboboxProps<T>) {
     </ArkField.Root>
   );
 }
+
+Combobox.Dropdown = function <Item>(props: {
+  items: Array<{ label: JSX.Element; item: Item }>;
+  class?: string;
+}) {
+  return (
+    <Portal>
+      <ArkCombobox.Positioner>
+        <ArkCombobox.Content
+          class={clsx('bg-zinc-100 border shadow rounded p-2 max-h-48 overflow-y-auto', props.class)}
+        >
+          <For each={props.items}>
+            {(item) => (
+              <ArkCombobox.Item item={item} class="row justify-between items-center">
+                <ArkCombobox.ItemText class="data-highlighted:font-semibold">
+                  {item.label}
+                </ArkCombobox.ItemText>
+
+                <ArkCombobox.ItemIndicator>
+                  <CheckIcon class="size-4" />
+                </ArkCombobox.ItemIndicator>
+              </ArkCombobox.Item>
+            )}
+          </For>
+        </ArkCombobox.Content>
+      </ArkCombobox.Positioner>
+    </Portal>
+  );
+};
