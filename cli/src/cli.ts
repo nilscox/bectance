@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { ProductStock, ShoppingList, Unit } from '@boubouffe/shared/dtos';
+import { Product, ProductStock, ShoppingList, Unit } from '@boubouffe/shared/dtos';
 import { toObject } from '@boubouffe/shared/utils';
 import { Command, InvalidArgumentError } from 'commander';
 import { Table } from 'console-table-printer';
@@ -8,6 +8,18 @@ import { Table } from 'console-table-printer';
 import { api } from './api';
 
 const product = new Command('product');
+
+product
+  .command('list')
+  .description('Print a list of all products')
+  .action(async () => {
+    const products = await api<Product[]>('GET', '/product');
+
+    printTable(
+      ['Name', 'Unit'],
+      products.map((product) => [product.name, product.unit]),
+    );
+  });
 
 product
   .command('create')
@@ -75,7 +87,7 @@ list
 list
   .command('create')
   .description('Create a new shopping list')
-  .argument('<name>', 'Name of the shopping list')
+  .requiredOption('--name', 'Name of the shopping list')
   .action(async (name) => {
     await api('POST', '/shopping-list', {
       body: { name },
