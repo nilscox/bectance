@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 
 import { NotFoundError } from '../errors.js';
 import { emitDomainEvent } from '../events.js';
@@ -40,6 +40,7 @@ export async function getShoppingList(listId: string) {
         with: {
           product: true,
         },
+        orderBy: asc(shoppingListItems.order),
       },
     },
   });
@@ -75,12 +76,15 @@ export async function createShoppingListItem(
   product: Product,
   options: Partial<{ quantity: number | false; checked: boolean }>,
 ) {
+  const count = await db.$count(shoppingListItems, eq(shoppingListItems.shoppingListId, list.id));
+
   const values = {
     id: createId(),
     shoppingListId: list.id,
     productId: product.id,
     quantity: options.quantity || null,
     checked: options.checked ?? false,
+    order: count,
   };
 
   await db.insert(shoppingListItems).values(values);

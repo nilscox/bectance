@@ -1,5 +1,15 @@
 import { relations } from 'drizzle-orm';
-import { PgEnum, boolean, date, integer, numeric, pgEnum, pgTable, varchar } from 'drizzle-orm/pg-core';
+import {
+  PgEnum,
+  boolean,
+  date,
+  integer,
+  numeric,
+  pgEnum,
+  pgTable,
+  unique,
+  varchar,
+} from 'drizzle-orm/pg-core';
 
 type PgEnumType<T> = T extends PgEnum<infer E> ? E[number] : never;
 
@@ -46,13 +56,18 @@ export const shoppingListsRelations = relations(shoppingList, ({ many }) => ({
 
 export type ShoppingListItem = typeof shoppingListItems.$inferSelect;
 
-export const shoppingListItems = pgTable('shopping_list_items', {
-  id: id().primaryKey(),
-  shoppingListId: id().notNull(),
-  productId: id().notNull(),
-  quantity: integer(),
-  checked: boolean().notNull(),
-});
+export const shoppingListItems = pgTable(
+  'shopping_list_items',
+  {
+    id: id().primaryKey(),
+    shoppingListId: id().notNull(),
+    productId: id().notNull(),
+    quantity: integer(),
+    checked: boolean().notNull(),
+    order: integer().notNull(),
+  },
+  (table) => [unique('order_unique').on(table.shoppingListId, table.order)],
+);
 
 export const shoppingListItemsRelations = relations(shoppingListItems, ({ one }) => ({
   shoppingList: one(shoppingList, {
