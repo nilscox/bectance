@@ -1,10 +1,13 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+
 import tailwindcss from '@tailwindcss/vite';
 import devtools from 'solid-devtools/vite';
-import { HttpProxy, defineConfig } from 'vite';
+import { HttpProxy, Plugin, defineConfig } from 'vite';
 import solid from 'vite-plugin-solid';
 
 export default defineConfig({
-  plugins: [devtools(), solid(), tailwindcss()],
+  plugins: [devtools(), solid(), tailwindcss(), copyFile({ src: 'index.html', dest: '404.html' })],
   server: {
     port: 8000,
     proxy: {
@@ -29,4 +32,23 @@ function configureApiProxy(proxy: HttpProxy.Server) {
       }
     });
   });
+}
+
+type CopyFileOptions = {
+  src: string;
+  dest: string;
+};
+
+function copyFile({ src, dest }: CopyFileOptions): Plugin {
+  let dist = '';
+
+  return {
+    name: 'outputFile',
+    configResolved(config) {
+      dist = path.resolve(config.root, config.build.outDir);
+    },
+    async closeBundle() {
+      await fs.copyFile(path.join(dist, src), path.join(dist, dest));
+    },
+  };
 }
