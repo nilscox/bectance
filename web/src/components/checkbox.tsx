@@ -26,7 +26,7 @@ export function Checkbox(props: {
         </ArkCheckbox.Indicator>
       </ArkCheckbox.Control>
 
-      <ArkCheckbox.HiddenInput />
+      <ArkCheckbox.HiddenInput class="!fixed" />
 
       <ArkCheckbox.Label class={props.classes?.label}>{props.label}</ArkCheckbox.Label>
     </ArkCheckbox.Root>
