@@ -20,9 +20,9 @@ export function Checkbox(props: {
       onCheckedChange={(event) => props.onChange?.(Boolean(event.checked))}
       class={clsx('inline-flex flex-row items-center gap-2 group', props.class)}
     >
-      <ArkCheckbox.Control class="border rounded size-4 group-data-disabled:opacity-50">
+      <ArkCheckbox.Control class="data-[state=unchecked]:border rounded size-4 group-data-disabled:opacity-50 data-[state=checked]:bg-zinc-500">
         <ArkCheckbox.Indicator>
-          <CheckIcon class="size-full" />
+          <CheckIcon class="size-full text-zinc-100 stroke-2" />
         </ArkCheckbox.Indicator>
       </ArkCheckbox.Control>
 
