@@ -3,7 +3,7 @@ name: Deploy frontend
 on:
   workflow_dispatch:
   push:
-    branches: ["master"]
+    branches: ['master']
 
 permissions:
   contents: read
@@ -11,7 +11,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: true
 
 jobs:
@@ -38,9 +38,12 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm --filter @boubouffe/web install
+        run: pnpm install --recursive
 
-      - name: Build
+      - name: Build packages
+        run: pnpm exec tsc --build
+
+      - name: Build web
         run: pnpm --filter @boubouffe/web build
 
       - name: Setup Pages
