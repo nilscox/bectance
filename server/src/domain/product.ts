@@ -21,7 +21,7 @@ export async function getProduct(productId: string) {
   return defined(product, new NotFoundError('Cannot find product', { id: productId }));
 }
 
-export async function createProduct(options: { name: string; unit: Unit }) {
+export async function createProduct(options: { name: string; unit: Unit; defaultQuantity: number }) {
   if (await productExists(options.name)) {
     throw new BadRequestError('Product already exists', { name: options.name });
   }
@@ -30,6 +30,7 @@ export async function createProduct(options: { name: string; unit: Unit }) {
     id: createId(),
     name: options.name,
     unit: options.unit,
+    defaultQuantity: options.defaultQuantity,
   });
 }
 

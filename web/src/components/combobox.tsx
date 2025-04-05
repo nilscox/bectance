@@ -101,7 +101,10 @@ Combobox.Dropdown = function <Item>(props: {
         <ArkCombobox.Content
           class={clsx('bg-zinc-100 shadow-md border rounded p-2 max-h-48 overflow-y-auto', props.class)}
         >
-          <For each={props.items}>
+          <For
+            each={props.items}
+            fallback={<div class="text-dim min-h-16 flex justify-center items-center">Aucun résultat</div>}
+          >
             {(item) => (
               <ArkCombobox.Item item={item} class="row justify-between items-center">
                 <ArkCombobox.ItemText class="data-highlighted:font-semibold">

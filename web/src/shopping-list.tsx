@@ -1,5 +1,5 @@
 import { Combobox as ArkCombobox, createListCollection } from '@ark-ui/solid';
-import type { DomainEvents, Product, ShoppingList, ShoppingListItem } from '@bectance/shared/dtos';
+import type { DomainEvents, Product, ShoppingList, ShoppingListItem, Unit } from '@bectance/shared/dtos';
 import { assert, hasProperty } from '@bectance/shared/utils';
 import { useParams } from '@solidjs/router';
 import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query';
@@ -210,10 +210,17 @@ function ShoppingListItem(props: {
     >
       <Checkbox
         label={
-          <>
-            {props.item.product.name}
-            {checkItem.isPending && <Spinner class="size-em ms-2 py-px" />}
-          </>
+          <div class="row gap-1 items-center">
+            <span class="first-letter:capitalize min-w-32">{props.item.product.name}</span>
+
+            <span class="text-dim text-sm">
+              {formatQuantity(props.item.quantity, props.item.product.unit)}
+            </span>
+
+            <Show when={checkItem.isPending}>
+              <Spinner class="size-em ms-2 py-px" />
+            </Show>
+          </div>
         }
         disabled={checkItem.isPending}
         checked={props.item.checked}
@@ -234,6 +241,24 @@ function ShoppingListItem(props: {
       </Show>
     </li>
   );
+}
+
+export function formatQuantity(quantity: number, unit: Unit) {
+  if (unit === 'unit') {
+    return quantity;
+  }
+
+  if (unit === 'liter') {
+    return `${quantity}L`;
+  }
+
+  if (unit === 'gram') {
+    if (quantity >= 1000) {
+      return `${quantity / 1000}Kg`;
+    }
+
+    return `${quantity}g`;
+  }
 }
 
 function useProductList() {

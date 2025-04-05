@@ -26,8 +26,9 @@ product
   .description('Create a new product')
   .requiredOption('--name <name>', 'Name of the product')
   .requiredOption('--unit <unit>', 'Unit of the product', parseUnit)
-  .action(async ({ name, unit }) => {
-    await api('POST', '/product', { body: { name, unit } });
+  .requiredOption('--default-quantity <quantity>', 'Default quantity of the product', parsePositiveInteger)
+  .action(async ({ name, unit, defaultQuantity }) => {
+    await api('POST', '/product', { body: { name, unit, defaultQuantity } });
   });
 
 product

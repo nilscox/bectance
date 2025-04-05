@@ -20,7 +20,7 @@ export type ShoppingList = {
 
 export type ShoppingListItem = {
   id: string;
-  quantity: number | null;
+  quantity: number;
   checked: boolean;
   product: Product;
 };
@@ -30,13 +30,13 @@ export type DomainEvents = {
     id: string;
     shoppingListId: string;
     productId: string;
-    quantity: number | null;
+    quantity: number;
     checked: boolean;
   };
 
   shoppingListItemUpdated: {
     id: string;
-    quantity?: number | null;
+    quantity?: number;
     checked?: boolean;
   };
 

@@ -15,6 +15,13 @@
       "when": 1743857358336,
       "tag": "0001_reconcile-shopping-list-item-position",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1743863533725,
+      "tag": "0002_add-product-default-quantity",
+      "breakpoints": true
     }
   ]
 }

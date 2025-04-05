@@ -10,7 +10,11 @@ interface ApiEndpointParams {
 
 export async function api<T>(method: HttpMethod, path: string, params?: ApiEndpointParams): Promise<T> {
   const apiBaseUrl = new URL(apiUrl);
-  const url = new URL(apiBaseUrl.pathname + path, apiBaseUrl.origin);
+  const url = new URL(path, apiBaseUrl.origin);
+
+  if (apiBaseUrl.pathname !== '/') {
+    url.pathname = apiBaseUrl.pathname + url.pathname;
+  }
 
   const headers = new Headers();
 

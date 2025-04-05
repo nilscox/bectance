@@ -24,6 +24,7 @@ export const products = pgTable('products', {
   id: id().primaryKey(),
   name: varchar({ length: 255 }).notNull().unique(),
   unit: unit().notNull(),
+  defaultQuantity: integer().notNull(),
 });
 
 export type Stock = typeof stocks.$inferSelect;
@@ -62,7 +63,7 @@ export const shoppingListItems = pgTable(
     id: id().primaryKey(),
     shoppingListId: id().notNull(),
     productId: id().notNull(),
-    quantity: integer(),
+    quantity: integer().notNull(),
     checked: boolean().notNull(),
     position: integer().notNull(),
   },

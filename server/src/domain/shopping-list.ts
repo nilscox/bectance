@@ -58,7 +58,7 @@ export async function createShoppingList(shoppingListName: string) {
 export async function upsertShoppingListItem(
   shoppingListId: string,
   productId: string,
-  options: Partial<{ quantity: number | false; checked: boolean }>,
+  options: Partial<{ quantity: number; checked: boolean }>,
 ) {
   const list = await getShoppingList(shoppingListId);
   const product = await getProduct(productId);
@@ -74,7 +74,7 @@ export async function upsertShoppingListItem(
 export async function createShoppingListItem(
   list: ShoppingList,
   product: Product,
-  options: Partial<{ quantity: number | false; checked: boolean }>,
+  options: Partial<{ quantity: number; checked: boolean }>,
 ) {
   const count = await db.$count(shoppingListItems, eq(shoppingListItems.shoppingListId, list.id));
 
@@ -82,7 +82,7 @@ export async function createShoppingListItem(
     id: createId(),
     shoppingListId: list.id,
     productId: product.id,
-    quantity: options.quantity || null,
+    quantity: options.quantity || product.defaultQuantity,
     checked: options.checked ?? false,
     position: count,
   };
@@ -94,17 +94,13 @@ export async function createShoppingListItem(
 
 export async function updateShoppingListItem(
   item: ShoppingListItem,
-  options: Partial<{ quantity: number | false; checked: boolean }>,
+  options: Partial<{ quantity: number; checked: boolean }>,
 ) {
   if (Object.keys(options).length === 0) {
     return;
   }
 
   const getQuantity = () => {
-    if (options.quantity === false) {
-      return null;
-    }
-
     if (options.quantity !== undefined) {
       return options.quantity;
     }

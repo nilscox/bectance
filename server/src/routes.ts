@@ -57,6 +57,7 @@ product.get('/:productId', async (req, res: Response<dtos.Product>) => {
 const createProductBody = z.object({
   name: z.string().min(2),
   unit: z.union([z.literal('unit'), z.literal('gram'), z.literal('liter')]),
+  defaultQuantity: z.number(),
 });
 
 product.post('/', validateRequestBody(createProductBody), async (req, res) => {
