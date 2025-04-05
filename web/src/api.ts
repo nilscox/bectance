@@ -1,4 +1,4 @@
-import { Product, ShoppingList } from '@boubouffe/shared/dtos';
+import { Product, ShoppingList } from '@bectance/shared/dtos';
 
 export async function listProducts() {
   const response = await fetch('/api/product');

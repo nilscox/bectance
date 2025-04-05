@@ -44,7 +44,7 @@ jobs:
         run: pnpm exec tsc --build
 
       - name: Build web
-        run: pnpm --filter @boubouffe/web build
+        run: pnpm --filter @bectance/web build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

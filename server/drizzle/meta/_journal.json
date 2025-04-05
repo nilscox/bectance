@@ -5,29 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1742327935417,
+      "when": 1743857352440,
       "tag": "0000_initial-schema",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1743853866863,
-      "tag": "0001_add-shopping-list-item-position",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1743853921821,
-      "tag": "0002_camel-to-snake-case",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1743854128816,
-      "tag": "0003_reconcile-shopping-list-item-position",
+      "when": 1743857358336,
+      "tag": "0001_reconcile-shopping-list-item-position",
       "breakpoints": true
     }
   ]

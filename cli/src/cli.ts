@@ -1,7 +1,7 @@
 import 'dotenv/config';
 
-import { Product, ProductStock, ShoppingList, Unit } from '@boubouffe/shared/dtos';
-import { toObject } from '@boubouffe/shared/utils';
+import { Product, ProductStock, ShoppingList, Unit } from '@bectance/shared/dtos';
+import { toObject } from '@bectance/shared/utils';
 import { Command, InvalidArgumentError } from 'commander';
 import { Table } from 'console-table-printer';
 

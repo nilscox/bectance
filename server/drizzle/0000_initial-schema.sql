@@ -15,14 +15,16 @@ CREATE TABLE "shopping_lists" (
 --> statement-breakpoint
 CREATE TABLE "shopping_list_items" (
 	"id" varchar(8) PRIMARY KEY NOT NULL,
-	"shoppingListId" varchar(8) NOT NULL,
-	"productId" varchar(8) NOT NULL,
+	"shopping_list_id" varchar(8) NOT NULL,
+	"product_id" varchar(8) NOT NULL,
 	"quantity" integer,
-	"checked" boolean NOT NULL
+	"checked" boolean NOT NULL,
+	"position" integer NOT NULL,
+	CONSTRAINT "position_unique" UNIQUE("shopping_list_id","position")
 );
 --> statement-breakpoint
 CREATE TABLE "stocks" (
 	"id" varchar(8) PRIMARY KEY NOT NULL,
-	"productId" varchar(8) NOT NULL,
+	"product_id" varchar(8) NOT NULL,
 	"quantity" integer NOT NULL
 );

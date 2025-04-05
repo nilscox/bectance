@@ -1,4 +1,4 @@
-import * as dtos from '@boubouffe/shared/dtos';
+import * as dtos from '@bectance/shared/dtos';
 import express, { Request, Response } from 'express';
 import { z } from 'zod';
 import { validateRequestBody } from 'zod-express-middleware';

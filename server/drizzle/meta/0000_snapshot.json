@@ -1,5 +1,5 @@
 {
-  "id": "86991dea-c7b6-4e9c-87e4-0f7be9b3985f",
+  "id": "6f74d422-3f21-4039-9427-1f07ce289397",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -91,14 +91,14 @@
           "primaryKey": true,
           "notNull": true
         },
-        "shoppingListId": {
-          "name": "shoppingListId",
+        "shopping_list_id": {
+          "name": "shopping_list_id",
           "type": "varchar(8)",
           "primaryKey": false,
           "notNull": true
         },
-        "productId": {
-          "name": "productId",
+        "product_id": {
+          "name": "product_id",
           "type": "varchar(8)",
           "primaryKey": false,
           "notNull": true
@@ -114,12 +114,27 @@
           "type": "boolean",
           "primaryKey": false,
           "notNull": true
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "position_unique": {
+          "name": "position_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "shopping_list_id",
+            "position"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -134,8 +149,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "productId": {
-          "name": "productId",
+        "product_id": {
+          "name": "product_id",
           "type": "varchar(8)",
           "primaryKey": false,
           "notNull": true

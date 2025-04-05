@@ -1,5 +1,5 @@
 {
-  "name": "@boubouffe/web",
+  "name": "@bectance/web",
   "type": "module",
   "private": true,
   "scripts": {
@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@ark-ui/solid": "^5.2.0",
-    "@boubouffe/shared": "workspace:^",
+    "@bectance/shared": "workspace:^",
     "@fontsource-variable/open-sans": "^5.2.5",
     "@solidjs/router": "^0.15.3",
     "@tanstack/solid-query": "^5.70.0",

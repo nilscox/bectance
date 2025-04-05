@@ -1,6 +1,6 @@
 import { Combobox as ArkCombobox, createListCollection } from '@ark-ui/solid';
-import type { DomainEvents, Product, ShoppingList, ShoppingListItem } from '@boubouffe/shared/dtos';
-import { assert, hasProperty } from '@boubouffe/shared/utils';
+import type { DomainEvents, Product, ShoppingList, ShoppingListItem } from '@bectance/shared/dtos';
+import { assert, hasProperty } from '@bectance/shared/utils';
 import { useParams } from '@solidjs/router';
 import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query';
 import { Trash2Icon, XIcon } from 'lucide-solid';

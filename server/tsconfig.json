@@ -10,8 +10,8 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "paths": {
-      "@boubouffe/shared/dtos": ["../shared/src/dtos.ts"],
-      "@boubouffe/shared/utils": ["../shared/src/utils.ts"]
+      "@bectance/shared/dtos": ["../shared/src/dtos.ts"],
+      "@Bectanceshared/utils": ["../shared/src/utils.ts"]
     }
   }
 }

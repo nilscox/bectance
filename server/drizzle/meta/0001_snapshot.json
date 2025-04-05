@@ -1,6 +1,6 @@
 {
-  "id": "51b17af3-4a4d-4a4d-8ab4-6f208db8afcd",
-  "prevId": "86991dea-c7b6-4e9c-87e4-0f7be9b3985f",
+  "id": "da5ce8ac-bf35-4b58-85b5-0cb2beba6420",
+  "prevId": "6f74d422-3f21-4039-9427-1f07ce289397",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -34,10 +34,10 @@
       "uniqueConstraints": {
         "products_name_unique": {
           "name": "products_name_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "name"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -91,14 +91,14 @@
           "primaryKey": true,
           "notNull": true
         },
-        "shoppingListId": {
-          "name": "shoppingListId",
+        "shopping_list_id": {
+          "name": "shopping_list_id",
           "type": "varchar(8)",
           "primaryKey": false,
           "notNull": true
         },
-        "productId": {
-          "name": "productId",
+        "product_id": {
+          "name": "product_id",
           "type": "varchar(8)",
           "primaryKey": false,
           "notNull": true
@@ -126,13 +126,13 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "order_unique": {
-          "name": "order_unique",
-          "nullsNotDistinct": false,
+        "position_unique": {
+          "name": "position_unique",
           "columns": [
-            "shoppingListId",
+            "shopping_list_id",
             "position"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -149,8 +149,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "productId": {
-          "name": "productId",
+        "product_id": {
+          "name": "product_id",
           "type": "varchar(8)",
           "primaryKey": false,
           "notNull": true
@@ -183,10 +183,10 @@
     }
   },
   "schemas": {},
+  "views": {},
   "sequences": {},
   "roles": {},
   "policies": {},
-  "views": {},
   "_meta": {
     "columns": {},
     "schemas": {},

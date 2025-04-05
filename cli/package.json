@@ -1,5 +1,5 @@
 {
-  "name": "@boubouffe/cli",
+  "name": "@bectance/cli",
   "type": "module",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
     "start": "tsx src/cli.ts"
   },
   "dependencies": {
-    "@boubouffe/shared": "workspace:^",
+    "@bectance/shared": "workspace:^",
     "commander": "^13.1.0",
     "console-table-printer": "^2.12.1",
     "dotenv": "^16.4.7"

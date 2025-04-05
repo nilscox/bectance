@@ -1,5 +1,5 @@
 {
-  "name": "@boubouffe/server",
+  "name": "@bectance/server",
   "type": "module",
   "private": true,
   "scripts": {
@@ -19,7 +19,7 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "@boubouffe/shared": "workspace:^",
+    "@bectance/shared": "workspace:^",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.1",
     "express": "^5.0.1",

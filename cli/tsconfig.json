@@ -7,8 +7,8 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "paths": {
-      "@boubouffe/shared/dtos": ["../shared/src/dtos.ts"],
-      "@boubouffe/shared/utils": ["../shared/src/utils.ts"]
+      "@bectance/shared/dtos": ["../shared/src/dtos.ts"],
+      "@bectance/shared/utils": ["../shared/src/utils.ts"]
     }
   }
 }

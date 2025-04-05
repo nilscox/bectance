@@ -1,4 +1,4 @@
-const apiUrl = process.env.API_URL;
+const apiUrl = process.env.API_URL as string;
 const debug = process.env.DEBUG === 'true';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -9,7 +9,9 @@ interface ApiEndpointParams {
 }
 
 export async function api<T>(method: HttpMethod, path: string, params?: ApiEndpointParams): Promise<T> {
-  const url = new URL(path, apiUrl);
+  const apiBaseUrl = new URL(apiUrl);
+  const url = new URL(apiBaseUrl.pathname + path, apiBaseUrl.origin);
+
   const headers = new Headers();
 
   const init: RequestInit = {

@@ -1,5 +1,5 @@
 {
-  "name": "@boubouffe/shared",
+  "name": "@bectance/shared",
   "type": "module",
   "exports": {
     "./dtos": "./dist/dtos.js",

@@ -1,6 +1,6 @@
 import EventEmitter from 'node:events';
 
-import { DomainEvents } from '@boubouffe/shared/dtos';
+import { DomainEvents } from '@bectance/shared/dtos';
 
 const events = new EventEmitter();
 
