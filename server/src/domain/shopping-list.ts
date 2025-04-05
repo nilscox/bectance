@@ -1,4 +1,4 @@
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, eq, sql } from 'drizzle-orm';
 
 import { NotFoundError } from '../errors.js';
 import { emitDomainEvent } from '../events.js';
@@ -40,7 +40,7 @@ export async function getShoppingList(listId: string) {
         with: {
           product: true,
         },
-        orderBy: asc(shoppingListItems.order),
+        orderBy: asc(shoppingListItems.position),
       },
     },
   });
@@ -84,7 +84,7 @@ export async function createShoppingListItem(
     productId: product.id,
     quantity: options.quantity || null,
     checked: options.checked ?? false,
-    order: count,
+    position: count,
   };
 
   await db.insert(shoppingListItems).values(values);
@@ -128,6 +128,7 @@ export async function updateShoppingListItem(
 
 export async function deleteShoppingListItem(shoppingListId: string, itemId: string) {
   await db.delete(shoppingListItems).where(eq(shoppingListItems.id, itemId));
+  await db.execute(sql`CALL reconcile_shopping_list_item_position(${shoppingListId})`);
 
   emitDomainEvent('shoppingListItemDeleted', { id: itemId });
 }

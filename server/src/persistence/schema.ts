@@ -64,9 +64,9 @@ export const shoppingListItems = pgTable(
     productId: id().notNull(),
     quantity: integer(),
     checked: boolean().notNull(),
-    order: integer().notNull(),
+    position: integer().notNull(),
   },
-  (table) => [unique('order_unique').on(table.shoppingListId, table.order)],
+  (table) => [unique('order_unique').on(table.shoppingListId, table.position)],
 );
 
 export const shoppingListItemsRelations = relations(shoppingListItems, ({ one }) => ({

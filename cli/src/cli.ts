@@ -87,8 +87,8 @@ list
 list
   .command('create')
   .description('Create a new shopping list')
-  .requiredOption('--name', 'Name of the shopping list')
-  .action(async (name) => {
+  .requiredOption('--name <name>', 'Name of the shopping list')
+  .action(async ({ name }) => {
     await api('POST', '/shopping-list', {
       body: { name },
     });
