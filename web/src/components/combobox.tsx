@@ -99,7 +99,7 @@ Combobox.Dropdown = function <Item>(props: {
     <Portal>
       <ArkCombobox.Positioner>
         <ArkCombobox.Content
-          class={clsx('bg-zinc-100 border shadow rounded p-2 max-h-48 overflow-y-auto', props.class)}
+          class={clsx('bg-zinc-100 shadow-md border rounded p-2 max-h-48 overflow-y-auto', props.class)}
         >
           <For each={props.items}>
             {(item) => (

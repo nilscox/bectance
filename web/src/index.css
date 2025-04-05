@@ -8,7 +8,7 @@
 
 @layer base {
   * {
-    border: var(--color-zinc-400);
+    border: var(--color-zinc-300);
   }
 }
 

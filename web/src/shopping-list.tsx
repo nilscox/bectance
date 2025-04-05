@@ -16,8 +16,8 @@ import { useLongPress } from './utils/long-press';
 
 export function ShoppingList() {
   const productList = useProductList();
-  const params = useParams<{ listId: string }>();
 
+  const params = useParams<{ listId: string }>();
   const query = createQuery(() => ({
     queryKey: ['getList', params.listId],
     queryFn: () => getShoppingList(params.listId),
@@ -47,7 +47,7 @@ export function ShoppingList() {
   };
 
   return (
-    <div class="p-4 col gap-6 mb-6">
+    <div class="col gap-6 mb-6">
       <div class="text-3xl">{query.data?.name}</div>
 
       <section>
