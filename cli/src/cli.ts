@@ -123,6 +123,18 @@ recipe
       recipes.map(({ name }) => [name]),
     );
   });
+
+recipe
+  .command('create')
+  .description('Create a new recipe')
+  .requiredOption('--name <name>', 'Name of the recipe')
+  .requiredOption('--description <description>', 'Description of the recipe')
+  .action(async ({ name, description }) => {
+    await api('POST', '/recipe', {
+      body: { name, description },
+    });
+  });
+
 const program = new Command();
 
 program.addCommand(product);
