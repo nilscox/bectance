@@ -8,6 +8,14 @@ export async function listProducts() {
   }
 }
 
+export async function listShoppingLists() {
+  const response = await fetch(`/api/shopping-list`);
+
+  if (response.ok) {
+    return response.json() as Promise<ShoppingList[]>;
+  }
+}
+
 export async function getShoppingList(listId: string) {
   const response = await fetch(`/api/shopping-list/${listId}`);
 

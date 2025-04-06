@@ -2,7 +2,7 @@ import { Combobox as ArkCombobox, createListCollection } from '@ark-ui/solid';
 import type { DomainEvents, Product, ShoppingList, ShoppingListItem, Unit } from '@bectance/shared/dtos';
 import { assert, hasProperty } from '@bectance/shared/utils';
 import { useParams } from '@solidjs/router';
-import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query';
 import { Trash2Icon, XIcon } from 'lucide-solid';
 import { For, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from 'solid-js';
 import { produce } from 'solid-js/store';
@@ -18,8 +18,8 @@ export function ShoppingList() {
   const productList = useProductList();
 
   const params = useParams<{ listId: string }>();
-  const query = createQuery(() => ({
-    queryKey: ['getList', params.listId],
+  const query = useQuery(() => ({
+    queryKey: ['getShoppingList', params.listId],
     queryFn: () => getShoppingList(params.listId),
   }));
 
@@ -129,7 +129,7 @@ function AddItemCombobox(props: {
 
   let inputRef!: HTMLInputElement;
 
-  const addItem = createMutation(() => ({
+  const addItem = useMutation(() => ({
     mutationFn: async ({ productId }: { productId: string }) => {
       const item = props.list?.items.find((item) => item.product.id === productId);
 
@@ -189,13 +189,13 @@ function ShoppingListItem(props: {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const longPress = useLongPress(200);
 
-  const checkItem = createMutation(() => ({
+  const checkItem = useMutation(() => ({
     mutationFn: async ({ checked }: { checked: boolean }) => {
       await upsertShoppingListItem(props.listId, props.item.product.id, { checked });
     },
   }));
 
-  const deleteItem = createMutation(() => ({
+  const deleteItem = useMutation(() => ({
     mutationFn: async () => {
       await deleteShoppingListItem(props.listId, props.item.id);
     },
@@ -262,7 +262,7 @@ export function formatQuantity(quantity: number, unit: Unit) {
 }
 
 function useProductList() {
-  return createQuery(() => ({
+  return useQuery(() => ({
     queryKey: ['listProducts'],
     queryFn: () => listProducts(),
   }));
@@ -272,7 +272,7 @@ function useUpdateList() {
   const queryClient = useQueryClient();
 
   return (listId: string, updater: (list: ShoppingList) => void) => {
-    queryClient.setQueryData(['getList', listId], (list: ShoppingList | undefined) => {
+    queryClient.setQueryData(['getShoppingList', listId], (list: ShoppingList | undefined) => {
       if (list) {
         return produce(updater)(list);
       }

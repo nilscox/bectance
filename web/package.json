@@ -3,7 +3,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "vite",
+    "lint": "eslint src",
+    "format": "prettier --check src",
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview"
