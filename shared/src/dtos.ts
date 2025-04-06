@@ -25,6 +25,19 @@ export type ShoppingListItem = {
   product: Product;
 };
 
+export type Recipe = {
+  id: string;
+  name: string;
+  description: string;
+  ingredients: Ingredient[];
+};
+
+export type Ingredient = {
+  id: string;
+  quantity: number;
+  product: Product;
+};
+
 export type DomainEvents = {
   shoppingListItemCreated: {
     id: string;

@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 
 import { BadRequestError, NotFoundError } from './errors.js';
 import { product } from './modules/product/product.api.js';
+import { recipe } from './modules/recipe/recipe.api.js';
 import { shoppingList } from './modules/shopping-list/shopping-list.api.js';
 import { stock } from './modules/stock/stock.api.js';
 
@@ -12,6 +13,7 @@ const api = express.Router();
 api.use('/product', product);
 api.use('/stock', stock);
 api.use('/shopping-list', shoppingList);
+api.use('/recipe', recipe);
 
 app.use(express.json());
 app.use(api);

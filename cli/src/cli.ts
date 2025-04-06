@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { Product, ProductStock, ShoppingList, Unit } from '@bectance/shared/dtos';
+import { Product, ProductStock, Recipe, ShoppingList, Unit } from '@bectance/shared/dtos';
 import { toObject } from '@bectance/shared/utils';
 import { Command, InvalidArgumentError } from 'commander';
 import { Table } from 'console-table-printer';
@@ -110,11 +110,25 @@ list
     });
   });
 
+const recipe = new Command('recipe');
+
+recipe
+  .command('list')
+  .description('Print a list of all recipes')
+  .action(async () => {
+    const recipes = await api<Recipe[]>('GET', `/recipe`);
+
+    printTable(
+      ['Name'],
+      recipes.map(({ name }) => [name]),
+    );
+  });
 const program = new Command();
 
 program.addCommand(product);
 program.addCommand(stock);
 program.addCommand(list);
+program.addCommand(recipe);
 
 program.hook('preAction', async function (_, action) {
   action.processedArgs = await Promise.all(action.processedArgs);

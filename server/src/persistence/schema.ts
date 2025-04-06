@@ -7,6 +7,7 @@ import {
   numeric,
   pgEnum,
   pgTable,
+  text,
   unique,
   varchar,
 } from 'drizzle-orm/pg-core';
@@ -77,6 +78,34 @@ export const shoppingListItemsRelations = relations(shoppingListItems, ({ one })
   }),
   product: one(products, {
     fields: [shoppingListItems.productId],
+    references: [products.id],
+  }),
+}));
+
+export const recipes = pgTable('recipes', {
+  id: id().primaryKey(),
+  name: varchar({ length: 255 }).notNull(),
+  description: text().notNull(),
+});
+
+export const recipesRelations = relations(recipes, ({ many }) => ({
+  ingredients: many(ingredients),
+}));
+
+export const ingredients = pgTable('ingredients', {
+  id: id().primaryKey(),
+  quantity: integer().notNull(),
+  recipeId: id().notNull(),
+  productId: id().notNull(),
+});
+
+export const ingredientsRelations = relations(ingredients, ({ one }) => ({
+  recipe: one(recipes, {
+    fields: [ingredients.recipeId],
+    references: [recipes.id],
+  }),
+  product: one(products, {
+    fields: [ingredients.productId],
     references: [products.id],
   }),
 }));
