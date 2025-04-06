@@ -82,6 +82,8 @@ export const shoppingListItemsRelations = relations(shoppingListItems, ({ one })
   }),
 }));
 
+export type Recipe = typeof recipes.$inferSelect;
+
 export const recipes = pgTable('recipes', {
   id: id().primaryKey(),
   name: varchar({ length: 255 }).notNull(),
@@ -91,6 +93,8 @@ export const recipes = pgTable('recipes', {
 export const recipesRelations = relations(recipes, ({ many }) => ({
   ingredients: many(ingredients),
 }));
+
+export type Ingredient = typeof ingredients.$inferSelect;
 
 export const ingredients = pgTable('ingredients', {
   id: id().primaryKey(),

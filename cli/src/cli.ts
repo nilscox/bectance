@@ -135,6 +135,18 @@ recipe
     });
   });
 
+recipe
+  .command('ingredient')
+  .description('Add an ingredient to a recipe')
+  .argument('<name>', 'Name of the recipe', parseRecipeName)
+  .argument('<product>', 'Name of the product', parseProductName)
+  .requiredOption('--quantity <quantity>', 'Quantity of ingredient', parsePositiveInteger)
+  .action(async (recipeId, productId, { quantity }) => {
+    await api('PUT', `/recipe/${recipeId}`, {
+      body: { productId, quantity },
+    });
+  });
+
 const program = new Command();
 
 program.addCommand(product);
@@ -198,6 +210,18 @@ async function parseProductName(name: string) {
   }
 
   return product.id;
+}
+
+async function parseRecipeName(name: string) {
+  const [recipe] = await api<{ id: string }[]>('GET', '/recipe', {
+    query: { name },
+  });
+
+  if (!recipe) {
+    throw new InvalidArgumentError('Cannot find recipe');
+  }
+
+  return recipe.id;
 }
 
 export function formatUnit(quantity: number, unit: Unit) {
