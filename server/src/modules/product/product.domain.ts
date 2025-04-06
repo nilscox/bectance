@@ -1,9 +1,9 @@
 import { and, eq } from 'drizzle-orm';
 
-import { BadRequestError, NotFoundError } from '../errors.js';
-import { db } from '../persistence/database.js';
-import { Unit, products } from '../persistence/schema.js';
-import { createId, defined } from '../utils.js';
+import { BadRequestError, NotFoundError } from '../../errors.js';
+import { db } from '../../persistence/database.js';
+import { Unit, products } from '../../persistence/schema.js';
+import { createId, defined } from '../../utils.js';
 
 export async function listProducts(filters?: { name?: string }) {
   let where = and();

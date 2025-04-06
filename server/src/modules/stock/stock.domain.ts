@@ -1,9 +1,9 @@
 import { eq } from 'drizzle-orm';
 
-import { db } from '../persistence/database.js';
-import { stocks } from '../persistence/schema.js';
-import { createId } from '../utils.js';
-import { getProduct } from './product.js';
+import { db } from '../../persistence/database.js';
+import { stocks } from '../../persistence/schema.js';
+import { createId } from '../../utils.js';
+import { getProduct } from '../product/product.domain.js';
 
 export async function getStock() {
   return db.query.stocks.findMany({

@@ -1,12 +1,20 @@
 import express, { NextFunction, Request, Response } from 'express';
 
 import { BadRequestError, NotFoundError } from './errors.js';
-import { routes } from './routes.js';
+import { product } from './modules/product/product.api.js';
+import { shoppingList } from './modules/shopping-list/shopping-list.api.js';
+import { stock } from './modules/stock/stock.api.js';
 
 export const app = express();
 
+const api = express.Router();
+
+api.use('/product', product);
+api.use('/stock', stock);
+api.use('/shopping-list', shoppingList);
+
 app.use(express.json());
-app.use(routes);
+app.use(api);
 app.use(apiErrorHandler);
 app.use(errorHandler);
 

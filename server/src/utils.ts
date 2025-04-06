@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import { customAlphabet } from 'nanoid';
 
 export const createId = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 8);
@@ -26,4 +27,10 @@ export function toObject<T, K extends PropertyKey, V>(
     (obj, item, index) => ({ ...obj, [getKey(item, index)]: getValue(item, index) }),
     {} as Record<K, V>,
   );
+}
+
+export function getQueryParam(req: Request, name: string): string | undefined {
+  if (typeof req.query[name] === 'string') {
+    return req.query[name];
+  }
 }
