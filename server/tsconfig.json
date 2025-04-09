@@ -11,7 +11,7 @@
     "noUncheckedIndexedAccess": true,
     "paths": {
       "@bectance/shared/dtos": ["../shared/src/dtos.ts"],
-      "@Bectanceshared/utils": ["../shared/src/utils.ts"]
+      "@bectance/shared/utils": ["../shared/src/utils.ts"]
     }
   }
 }

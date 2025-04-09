@@ -18,6 +18,12 @@ export default defineConfig({
       },
     },
   },
+  resolve: {
+    alias: {
+      '@bectance/shared/dtos': path.resolve(__dirname, '../shared/src/dtos.ts'),
+      '@bectance/shared/utils': path.resolve(__dirname, '../shared/src/utils.ts'),
+    },
+  },
   build: {
     target: 'esnext',
   },
