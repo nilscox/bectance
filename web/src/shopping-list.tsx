@@ -335,10 +335,14 @@ function useShoppingListEventSource(getListId: () => string) {
 
   let eventSource: EventSource;
 
+  const reconnectTimeouts = [0, 500, 1_000, 2_000, 5_000];
+  let reconnectTimeoutIndex = -1;
+
   const connect = () => {
     eventSource = new EventSource(`/api/shopping-list/${getListId()}/events`);
 
     eventSource.onopen = () => {
+      reconnectTimeoutIndex = -1;
       queryClient.invalidateQueries({ queryKey: ['getShoppingList', getListId()] });
     };
 
@@ -383,7 +387,14 @@ function useShoppingListEventSource(getListId: () => string) {
     eventSource.onerror = (err) => {
       console.error('EventSource failed:', err);
       eventSource.close();
-      connect();
+
+      const timeout = reconnectTimeouts[++reconnectTimeoutIndex];
+
+      if (timeout !== undefined) {
+        setTimeout(connect, timeout);
+      } else {
+        alert('Event stream disconnected');
+      }
     };
   };
 
