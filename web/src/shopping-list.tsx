@@ -327,13 +327,20 @@ function useUpdateListItem() {
 }
 
 function useShoppingListEventSource(getListId: () => string) {
+  const queryClient = useQueryClient();
   const productList = useProductList();
 
   const updateList = useUpdateList();
   const updateItem = useUpdateListItem();
 
-  onMount(() => {
-    const eventSource = new EventSource(`/api/shopping-list/${getListId()}/events`);
+  let eventSource: EventSource;
+
+  const connect = () => {
+    eventSource = new EventSource(`/api/shopping-list/${getListId()}/events`);
+
+    eventSource.onopen = () => {
+      queryClient.invalidateQueries({ queryKey: ['getShoppingList', getListId()] });
+    };
 
     eventSource.addEventListener('shoppingListItemUpdated', (event) => {
       const { id, ...data }: DomainEvents['shoppingListItemUpdated'] = JSON.parse(event.data);
@@ -375,7 +382,13 @@ function useShoppingListEventSource(getListId: () => string) {
 
     eventSource.onerror = (err) => {
       console.error('EventSource failed:', err);
+      eventSource.close();
+      connect();
     };
+  };
+
+  onMount(() => {
+    connect();
 
     onCleanup(() => {
       eventSource.close();
