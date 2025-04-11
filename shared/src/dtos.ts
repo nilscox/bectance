@@ -20,9 +20,10 @@ export type ShoppingList = {
 
 export type ShoppingListItem = {
   id: string;
-  quantity: number;
+  label: string;
   checked: boolean;
-  product: Product;
+  quantity?: number;
+  unit?: Unit;
 };
 
 export type Recipe = {
@@ -42,13 +43,15 @@ export type DomainEvents = {
   shoppingListItemCreated: {
     id: string;
     shoppingListId: string;
-    productId: string;
-    quantity: number;
+    label: string;
     checked: boolean;
+    quantity?: number;
+    unit?: Unit;
   };
 
   shoppingListItemUpdated: {
     id: string;
+    label?: string;
     quantity?: number;
     checked?: boolean;
   };

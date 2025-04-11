@@ -5,20 +5,21 @@ import { z } from 'zod';
 import { validateRequestBody } from 'zod-express-middleware';
 
 import { addDomainEventListener } from '../../events.js';
+import { Product, ShoppingList, ShoppingListItem } from '../../persistence/schema.js';
 import { getQueryParam } from '../../utils.js';
-import { mapProduct } from '../product/product.api.js';
 import {
   createShoppingList,
+  createShoppingListItem,
   deleteShoppingListItem,
   getShoppingList,
   listShoppingLists,
-  upsertShoppingListItem,
+  updateShoppingListItem,
 } from './shopping-list.domain.js';
 
 export const shoppingList = express.Router();
 
 function mapShoppingList(
-  list: dtos.ShoppingList & { items: (dtos.ShoppingListItem & { product: dtos.Product })[] },
+  list: ShoppingList & { items: (ShoppingListItem & { product: Product | null })[] },
 ): dtos.ShoppingList {
   return {
     id: list.id,
@@ -27,9 +28,10 @@ function mapShoppingList(
     cost: list.cost,
     items: list.items.map((item) => ({
       id: item.id,
-      quantity: item.quantity,
+      quantity: item.quantity ?? undefined,
       checked: item.checked,
-      product: mapProduct(item.product),
+      label: (item.product?.name ?? item.label) as string,
+      unit: item.product?.unit,
     })),
   };
 }
@@ -80,18 +82,38 @@ shoppingList.post('/', validateRequestBody(createShoppingListBody), async (req, 
   res.status(201).end();
 });
 
-const upsertShoppingListItemBody = z
+const createShoppingListItemBodyOptions = z.object({
+  quantity: z.number().min(0).optional(),
+  checked: z.boolean().optional(),
+});
+
+const createShoppingListItemBody = z.union([
+  createShoppingListItemBodyOptions.extend({
+    productId: z.string(),
+  }),
+  createShoppingListItemBodyOptions.extend({
+    label: z.string(),
+  }),
+]);
+
+shoppingList.post('/:listId', validateRequestBody(createShoppingListItemBody), async (req, res) => {
+  assert(req.params.listId);
+
+  res.json(await createShoppingListItem(req.params.listId, req.body, req.body));
+});
+
+const updateShoppingListItemBody = z
   .object({
     quantity: z.number().min(0),
     checked: z.boolean(),
   })
   .partial();
 
-shoppingList.put('/:listId/:productId', validateRequestBody(upsertShoppingListItemBody), async (req, res) => {
+shoppingList.put('/:listId/:itemId', validateRequestBody(updateShoppingListItemBody), async (req, res) => {
   assert(req.params.listId);
-  assert(req.params.productId);
+  assert(req.params.itemId);
 
-  res.json(await upsertShoppingListItem(req.params.listId, req.params.productId, req.body));
+  res.json(await updateShoppingListItem(req.params.itemId, req.body));
 });
 
 shoppingList.delete('/:listId/:itemId', async (req, res) => {

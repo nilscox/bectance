@@ -3,15 +3,9 @@ import { and, asc, eq, sql } from 'drizzle-orm';
 import { NotFoundError } from '../../errors.js';
 import { emitDomainEvent } from '../../events.js';
 import { db } from '../../persistence/database.js';
-import {
-  Product,
-  ShoppingList,
-  ShoppingListItem,
-  shoppingList,
-  shoppingListItems,
-} from '../../persistence/schema.js';
-import { createId, defined, hasProperty } from '../../utils.js';
-import { getProduct } from '../product/product.domain.js';
+import { shoppingList, shoppingListItems } from '../../persistence/schema.js';
+import { createId, defined } from '../../utils.js';
+import { findProduct } from '../product/product.domain.js';
 
 export async function listShoppingLists(filters?: { name?: string }) {
   let where = and();
@@ -55,45 +49,42 @@ export async function createShoppingList(shoppingListName: string) {
   });
 }
 
-export async function upsertShoppingListItem(
-  shoppingListId: string,
-  productId: string,
-  options: Partial<{ quantity: number; checked: boolean }>,
-) {
-  const list = await getShoppingList(shoppingListId);
-  const product = await getProduct(productId);
-  const item = list.items.find(hasProperty('productId', product.id));
-
-  if (item) {
-    await updateShoppingListItem(item, options);
-  } else {
-    await createShoppingListItem(list, product, options);
-  }
-}
-
 export async function createShoppingListItem(
-  list: ShoppingList,
-  product: Product,
+  listId: string,
+  param: { productId: string } | { label: string },
   options: Partial<{ quantity: number; checked: boolean }>,
 ) {
-  const count = await db.$count(shoppingListItems, eq(shoppingListItems.shoppingListId, list.id));
+  const productId = 'productId' in param ? param.productId : undefined;
+  const label = 'label' in param ? param.label : undefined;
 
-  const values = {
+  const product = productId ? await findProduct(productId) : undefined;
+
+  const count = await db.$count(shoppingListItems, eq(shoppingListItems.shoppingListId, listId));
+
+  const values: typeof shoppingListItems.$inferInsert = {
     id: createId(),
-    shoppingListId: list.id,
-    productId: product.id,
-    quantity: options.quantity || product.defaultQuantity,
+    shoppingListId: listId,
+    productId,
+    label,
+    quantity: options.quantity || product?.defaultQuantity,
     checked: options.checked ?? false,
     position: count,
   };
 
   await db.insert(shoppingListItems).values(values);
 
-  emitDomainEvent('shoppingListItemCreated', values);
+  emitDomainEvent('shoppingListItemCreated', {
+    id: createId(),
+    shoppingListId: listId,
+    label: (product?.name ?? label) as string,
+    quantity: options.quantity || product?.defaultQuantity,
+    checked: options.checked ?? false,
+    unit: product?.unit,
+  });
 }
 
 export async function updateShoppingListItem(
-  item: ShoppingListItem,
+  itemId: string,
   options: Partial<{ quantity: number; checked: boolean }>,
 ) {
   if (Object.keys(options).length === 0) {
@@ -117,9 +108,12 @@ export async function updateShoppingListItem(
     checked: getChecked(),
   };
 
-  await db.update(shoppingListItems).set(values).where(eq(shoppingListItems.id, item.id));
+  await db.update(shoppingListItems).set(values).where(eq(shoppingListItems.id, itemId));
 
-  emitDomainEvent('shoppingListItemUpdated', { id: item.id, ...values });
+  emitDomainEvent('shoppingListItemUpdated', {
+    id: itemId,
+    ...options,
+  });
 }
 
 export async function deleteShoppingListItem(shoppingListId: string, itemId: string) {

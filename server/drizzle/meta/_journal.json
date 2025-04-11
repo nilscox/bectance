@@ -22,6 +22,20 @@
       "when": 1743863533725,
       "tag": "0002_add-product-default-quantity",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1744391851600,
+      "tag": "0003_create-recipes-table",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1744392223364,
+      "tag": "0004_shopping-list-items-product-id-nullable",
+      "breakpoints": true
     }
   ]
 }

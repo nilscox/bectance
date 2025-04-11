@@ -15,10 +15,12 @@ export async function listProducts(filters?: { name?: string }) {
   return db.query.products.findMany({ where });
 }
 
-export async function getProduct(productId: string) {
-  const [product] = await db.select().from(products).where(eq(products.id, productId));
+export async function findProduct(productId: string) {
+  return db.query.products.findFirst({ where: eq(products.id, productId) });
+}
 
-  return defined(product, new NotFoundError('Cannot find product', { id: productId }));
+export async function getProduct(productId: string) {
+  return defined(await findProduct(productId), new NotFoundError('Cannot find product', { id: productId }));
 }
 
 export async function createProduct(options: { name: string; unit: Unit; defaultQuantity: number }) {

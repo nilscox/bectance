@@ -24,7 +24,19 @@ export async function getShoppingList(listId: string) {
   }
 }
 
-export async function upsertShoppingListItem(
+export async function createShoppingListItem(
+  listId: string,
+  param: { productId: string } | { label: string },
+  body: Partial<{ checked: boolean; quantity: boolean }> = {},
+) {
+  await fetch(`/api/shopping-list/${listId}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...param, ...body }),
+  });
+}
+
+export async function updateShoppingListItem(
   listId: string,
   productId: string,
   body: Partial<{ checked: boolean; quantity: boolean }> = {},

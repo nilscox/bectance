@@ -8,7 +8,13 @@ import { For, Show, createEffect, createMemo, createSignal, onCleanup, onMount }
 import { produce } from 'solid-js/store';
 import { Dynamic } from 'solid-js/web';
 
-import { deleteShoppingListItem, getShoppingList, listProducts, upsertShoppingListItem } from './api';
+import {
+  createShoppingListItem,
+  deleteShoppingListItem,
+  getShoppingList,
+  listProducts,
+  updateShoppingListItem,
+} from './api';
 import { Checkbox } from './components/checkbox';
 import { Combobox } from './components/combobox';
 import { Header as BaseHeader } from './components/header';
@@ -163,13 +169,17 @@ function AddItemCombobox(props: {
   let inputRef!: HTMLInputElement;
 
   const addItem = useMutation(() => ({
-    mutationFn: async ({ productId }: { productId: string }) => {
-      const item = props.list?.items.find((item) => item.product.id === productId);
+    mutationFn: async (variables: { productId: string } | { label: string }) => {
+      const productId = 'productId' in variables ? variables.productId : undefined;
+      const label = 'label' in variables ? variables.label : undefined;
+
+      const product = products().find(hasProperty('id', productId));
+      const item = props.list?.items.find(hasProperty('label', product?.name ?? label));
 
       if (item) {
         props.onHighlight(item);
       } else if (props.list) {
-        await upsertShoppingListItem(props.list?.id, productId);
+        await createShoppingListItem(props.list?.id, variables);
       }
     },
     onSuccess() {
@@ -183,12 +193,16 @@ function AddItemCombobox(props: {
     },
   }));
 
+  const [highlightedValue, setHighlightedValue] = createSignal<string | null>(null);
+
   return (
     <ArkCombobox.Root
       collection={collection()}
       onInputValueChange={({ inputValue }) => {
         setProducts(props.products.filter((product) => product.name.includes(inputValue)));
       }}
+      highlightedValue={highlightedValue()}
+      onHighlightChange={({ highlightedValue }) => setHighlightedValue(highlightedValue)}
       value={value()}
       onValueChange={({ items, value }) => {
         setValue(value);
@@ -203,6 +217,14 @@ function AddItemCombobox(props: {
           ref={inputRef}
           disabled={addItem.isPending}
           placeholder="Ajouter un produit"
+          onKeyDown={(event) => {
+            const value = event.currentTarget.value;
+
+            if (event.key === 'Enter' && value && !highlightedValue()) {
+              event.stopPropagation();
+              addItem.mutate({ label: value });
+            }
+          }}
           class="outline-none w-full"
         />
       </ArkCombobox.Control>
@@ -224,7 +246,7 @@ function ShoppingListItem(props: {
 
   const checkItem = useMutation(() => ({
     mutationFn: async ({ checked }: { checked: boolean }) => {
-      await upsertShoppingListItem(props.listId, props.item.product.id, { checked });
+      await updateShoppingListItem(props.listId, props.item.id, { checked });
     },
   }));
 
@@ -244,11 +266,9 @@ function ShoppingListItem(props: {
       <Checkbox
         label={
           <div class="row gap-1 items-center">
-            <span class="first-letter:capitalize min-w-32">{props.item.product.name}</span>
+            <span class="first-letter:capitalize min-w-32">{props.item.label}</span>
 
-            <span class="text-dim text-sm">
-              {formatQuantity(props.item.quantity, props.item.product.unit)}
-            </span>
+            <span class="text-dim text-sm">{formatQuantity(props.item.quantity, props.item.unit)}</span>
 
             <Show when={checkItem.isPending}>
               <Spinner class="size-em ms-2 py-px" />
@@ -276,7 +296,11 @@ function ShoppingListItem(props: {
   );
 }
 
-export function formatQuantity(quantity: number, unit: Unit) {
+export function formatQuantity(quantity?: number, unit?: Unit) {
+  if (!quantity || !unit) {
+    return '';
+  }
+
   if (unit === 'unit') {
     return quantity;
   }
@@ -328,7 +352,6 @@ function useUpdateListItem() {
 
 function useShoppingListEventSource(getListId: () => string) {
   const queryClient = useQueryClient();
-  const productList = useProductList();
 
   const updateList = useUpdateList();
   const updateItem = useUpdateListItem();
@@ -356,18 +379,14 @@ function useShoppingListEventSource(getListId: () => string) {
 
     eventSource.addEventListener('shoppingListItemCreated', (event) => {
       const data: DomainEvents['shoppingListItemCreated'] = JSON.parse(event.data);
-      const product = productList.data?.find(hasProperty('id', data.productId));
-
-      if (!product) {
-        return;
-      }
 
       updateList(getListId(), (list) => {
         list.items.push({
           id: data.id,
-          product,
+          label: data.label,
           checked: data.checked,
           quantity: data.quantity,
+          unit: data.unit,
         });
       });
     });

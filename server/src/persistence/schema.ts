@@ -1,7 +1,8 @@
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import {
   PgEnum,
   boolean,
+  check,
   date,
   integer,
   numeric,
@@ -63,12 +64,16 @@ export const shoppingListItems = pgTable(
   {
     id: id().primaryKey(),
     shoppingListId: id().notNull(),
-    productId: id().notNull(),
-    quantity: integer().notNull(),
+    productId: id(),
+    label: varchar({ length: 255 }),
+    quantity: integer(),
     checked: boolean().notNull(),
     position: integer().notNull(),
   },
-  (table) => [unique('position_unique').on(table.shoppingListId, table.position)],
+  (table) => [
+    unique('position_unique').on(table.shoppingListId, table.position),
+    check('shopping_list_items_product_id_xor_label', sql`("product_id" IS NULL) != ("label" IS NULL)`),
+  ],
 );
 
 export const shoppingListItemsRelations = relations(shoppingListItems, ({ one }) => ({

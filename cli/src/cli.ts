@@ -78,8 +78,8 @@ list
     printTable(
       ['Product', 'Qty', 'Checked'],
       list.items.map((item) => [
-        item.product.name,
-        item.quantity ? formatUnit(item.quantity, item.product.unit) : '',
+        item.label,
+        item.quantity ? formatUnit(item.quantity, item.unit) : '',
         item.checked ? 'x' : '',
       ]),
     );
@@ -224,7 +224,11 @@ async function parseRecipeName(name: string) {
   return recipe.id;
 }
 
-export function formatUnit(quantity: number, unit: Unit) {
+export function formatUnit(quantity: number, unit?: Unit) {
+  if (!unit) {
+    return '';
+  }
+
   if (unit === 'unit') {
     return `${quantity}`;
   }
