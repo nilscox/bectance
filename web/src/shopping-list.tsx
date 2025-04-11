@@ -1,9 +1,9 @@
 import { Combobox as ArkCombobox, createListCollection } from '@ark-ui/solid';
 import type { DomainEvents, Product, ShoppingList, ShoppingListItem, Unit } from '@bectance/shared/dtos';
 import { assert, hasProperty } from '@bectance/shared/utils';
-import { useParams } from '@solidjs/router';
+import { A, useParams } from '@solidjs/router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query';
-import { Trash2Icon, XIcon } from 'lucide-solid';
+import { ArchiveIcon, CheckIcon, ChevronLeftIcon, ShoppingCartIcon, Trash2Icon, XIcon } from 'lucide-solid';
 import { For, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from 'solid-js';
 import { produce } from 'solid-js/store';
 import { Dynamic } from 'solid-js/web';
@@ -11,10 +11,45 @@ import { Dynamic } from 'solid-js/web';
 import { deleteShoppingListItem, getShoppingList, listProducts, upsertShoppingListItem } from './api';
 import { Checkbox } from './components/checkbox';
 import { Combobox } from './components/combobox';
+import { Header as BaseHeader } from './components/header';
+import { Menu } from './components/menu';
 import { Spinner } from './components/spinner';
 import { useLongPress } from './utils/long-press';
 
-export function ShoppingList() {
+export { Header, Page };
+
+function Header() {
+  const params = useParams<{ listId: string }>();
+  const query = useQuery(() => ({
+    queryKey: ['getShoppingList', params.listId],
+    queryFn: () => getShoppingList(params.listId),
+  }));
+
+  return (
+    <BaseHeader
+      left={
+        <A href="/list" class="p-1">
+          <ChevronLeftIcon class="text-dim size-6" />
+        </A>
+      }
+      right={
+        <Menu>
+          <Menu.Item value="" icon={CheckIcon} label="Terminer" />
+          <Menu.Item value="" icon={ArchiveIcon} label="Archiver" />
+        </Menu>
+      }
+      section={
+        <>
+          <ShoppingCartIcon class="size-em mb-0.5" />
+          Liste de courses
+        </>
+      }
+      title={query.data?.name}
+    />
+  );
+}
+
+function Page() {
   const productList = useProductList();
 
   const params = useParams<{ listId: string }>();
@@ -48,8 +83,6 @@ export function ShoppingList() {
 
   return (
     <div class="col gap-6 mb-6">
-      <div class="text-3xl">{query.data?.name}</div>
-
       <section>
         <header class="row justify-between items-center mb-2">
           <h2 class="text-xl font-bold text-dim">Plats</h2>
