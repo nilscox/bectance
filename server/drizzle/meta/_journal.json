@@ -36,6 +36,13 @@
       "when": 1744392223364,
       "tag": "0004_shopping-list-items-product-id-nullable",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1744653202602,
+      "tag": "0005_remove-shopping-list-item-quantity-not-null",
+      "breakpoints": true
     }
   ]
 }
