@@ -81,8 +81,11 @@ const createShoppingListBody = z.object({
 });
 
 shoppingList.post('/', validateRequestBody(createShoppingListBody), async (req, res) => {
-  await createShoppingList(createId(), req.body.name);
-  res.status(201).end();
+  const listId = createId();
+
+  await createShoppingList(listId, req.body.name);
+
+  res.status(201).send(listId);
 });
 
 const createShoppingListItemBodyOptions = z.object({

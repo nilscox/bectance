@@ -4,12 +4,13 @@ import { EllipsisVerticalIcon } from 'lucide-solid';
 import { Component, JSX } from 'solid-js';
 
 type MenuProps = {
+  onSelect: Record<string, () => void>;
   children: JSX.Element;
 };
 
 export function Menu(props: MenuProps) {
   return (
-    <ArkMenu.Root>
+    <ArkMenu.Root onSelect={({ value }) => props.onSelect[value]?.()}>
       <ArkMenu.Trigger class="outline-none data-[state=open]:bg-zinc-100 transition-colors rounded p-1">
         {<EllipsisVerticalIcon class="text-dim size-6" />}
       </ArkMenu.Trigger>

@@ -24,6 +24,16 @@ export async function getShoppingList(listId: string) {
   }
 }
 
+export async function createShoppingList(name: string) {
+  const response = await fetch(`/api/shopping-list`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+
+  return response.text();
+}
+
 export async function createShoppingListItem(
   listId: string,
   param: { productId: string } | { label: string },

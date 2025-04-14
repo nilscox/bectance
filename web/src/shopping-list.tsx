@@ -33,13 +33,14 @@ function Header() {
 
   return (
     <BaseHeader
+      title={query.data?.name}
       left={
         <A href="/list" class="p-1">
           <ChevronLeftIcon class="text-dim size-6" />
         </A>
       }
       right={
-        <Menu>
+        <Menu onSelect={{}}>
           <Menu.Item value="" icon={CheckIcon} label="Terminer" />
           <Menu.Item value="" icon={ArchiveIcon} label="Archiver" />
         </Menu>
@@ -50,7 +51,6 @@ function Header() {
           Liste de courses
         </>
       }
-      title={query.data?.name}
     />
   );
 }
