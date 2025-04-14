@@ -6,7 +6,7 @@ import { validateRequestBody } from 'zod-express-middleware';
 
 import { addDomainEventListener } from '../../events.js';
 import { Product, ShoppingList, ShoppingListItem } from '../../persistence/schema.js';
-import { getQueryParam } from '../../utils.js';
+import { createId, getQueryParam } from '../../utils.js';
 import {
   createShoppingList,
   createShoppingListItem,
@@ -78,7 +78,7 @@ const createShoppingListBody = z.object({
 });
 
 shoppingList.post('/', validateRequestBody(createShoppingListBody), async (req, res) => {
-  await createShoppingList(req.body.name);
+  await createShoppingList(createId(), req.body.name);
   res.status(201).end();
 });
 
@@ -99,7 +99,7 @@ const createShoppingListItemBody = z.union([
 shoppingList.post('/:listId', validateRequestBody(createShoppingListItemBody), async (req, res) => {
   assert(req.params.listId);
 
-  res.json(await createShoppingListItem(req.params.listId, req.body, req.body));
+  res.json(await createShoppingListItem(req.params.listId, createId(), req.body, req.body));
 });
 
 const updateShoppingListItemBody = z

@@ -4,7 +4,7 @@ import { NotFoundError } from '../../errors.js';
 import { emitDomainEvent } from '../../events.js';
 import { db } from '../../persistence/database.js';
 import { shoppingList, shoppingListItems } from '../../persistence/schema.js';
-import { createId, defined } from '../../utils.js';
+import { defined } from '../../utils.js';
 import { findProduct } from '../product/product.domain.js';
 
 export async function listShoppingLists(filters?: { name?: string }) {
@@ -42,15 +42,16 @@ export async function getShoppingList(listId: string) {
   return defined(list, new NotFoundError('Cannot find shopping list', { id: listId }));
 }
 
-export async function createShoppingList(shoppingListName: string) {
+export async function createShoppingList(shoppingListId: string, shoppingListName: string) {
   await db.insert(shoppingList).values({
-    id: createId(),
+    id: shoppingListId,
     name: shoppingListName,
   });
 }
 
 export async function createShoppingListItem(
   listId: string,
+  itemId: string,
   param: { productId: string } | { label: string },
   options: Partial<{ quantity: number; checked: boolean }>,
 ) {
@@ -62,7 +63,7 @@ export async function createShoppingListItem(
   const count = await db.$count(shoppingListItems, eq(shoppingListItems.shoppingListId, listId));
 
   const values: typeof shoppingListItems.$inferInsert = {
-    id: createId(),
+    id: itemId,
     shoppingListId: listId,
     productId,
     label,
@@ -74,7 +75,7 @@ export async function createShoppingListItem(
   await db.insert(shoppingListItems).values(values);
 
   emitDomainEvent('shoppingListItemCreated', {
-    id: createId(),
+    id: itemId,
     shoppingListId: listId,
     label: (product?.name ?? label) as string,
     quantity: options.quantity || product?.defaultQuantity,
