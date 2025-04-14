@@ -64,6 +64,9 @@ shoppingList.get('/:listId/events', (req, res) => {
     return addDomainEventListener(event, (payload: unknown) => handleEvent(event, payload));
   });
 
+  res.write('event: connected\n');
+  res.write('data:\n\n');
+
   console.debug('Client connected to shopping list event stream');
 
   req.on('close', () => {
