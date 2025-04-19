@@ -21,6 +21,7 @@ import { Menu } from './components/menu';
 import { Spinner } from './components/spinner';
 import { ArchiveIcon, CheckIcon, ChevronLeftIcon, ShoppingCartIcon, Trash2Icon, XIcon } from './icons';
 import { useLongPress } from './utils/long-press';
+import { createSearchIndex } from './utils/search';
 
 export { Header, Page };
 
@@ -195,12 +196,15 @@ function AddItemCombobox(props: {
 
   const [highlightedValue, setHighlightedValue] = createSignal<string | null>(null);
 
+  const search = createSearchIndex(
+    () => props.products,
+    (product) => product.name,
+  );
+
   return (
     <ArkCombobox.Root
       collection={collection()}
-      onInputValueChange={({ inputValue }) => {
-        setProducts(props.products.filter((product) => product.name.includes(inputValue)));
-      }}
+      onInputValueChange={({ inputValue }) => setProducts(search(inputValue))}
       highlightedValue={highlightedValue()}
       onHighlightChange={({ highlightedValue }) => setHighlightedValue(highlightedValue)}
       value={value()}
