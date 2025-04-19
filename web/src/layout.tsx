@@ -1,7 +1,7 @@
 import { A, useMatch } from '@solidjs/router';
-import { CookingPotIcon, HouseIcon, ShoppingCartIcon } from 'lucide-solid';
 import { JSX, Show } from 'solid-js';
 
+import { CookingPotIcon, HouseIcon, ShoppingCartIcon } from './icons';
 import * as shoppingList from './shopping-list';
 import * as shoppingListList from './shopping-lists';
 

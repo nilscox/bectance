@@ -1,7 +1,8 @@
 import { Checkbox as ArkCheckbox } from '@ark-ui/solid';
 import clsx from 'clsx';
-import { CheckIcon } from 'lucide-solid';
 import { JSX } from 'solid-js';
+
+import { CheckIcon } from '../icons';
 
 export function Checkbox(props: {
   label?: JSX.Element;

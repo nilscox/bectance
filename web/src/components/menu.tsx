@@ -1,7 +1,8 @@
 import { Menu as ArkMenu } from '@ark-ui/solid';
 import clsx from 'clsx';
-import { EllipsisVerticalIcon } from 'lucide-solid';
 import { Component, JSX } from 'solid-js';
+
+import { EllipsisVerticalIcon } from '../icons';
 
 type MenuProps = {
   onSelect: Record<string, () => void>;

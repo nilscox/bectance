@@ -1,7 +1,6 @@
 import { assert } from '@bectance/shared/utils';
 import { A, useNavigate } from '@solidjs/router';
 import { useMutation, useQuery } from '@tanstack/solid-query';
-import { PlusIcon, ShoppingCartIcon } from 'lucide-solid';
 import { For, createSignal } from 'solid-js';
 
 import { createShoppingList, listShoppingLists } from './api';
@@ -10,6 +9,7 @@ import { Dialog } from './components/dialog';
 import { Header as BaseHeader } from './components/header';
 import { Input } from './components/input';
 import { Menu } from './components/menu';
+import { PlusIcon, ShoppingCartIcon } from './icons';
 
 export { Header, Page };
 

@@ -6,9 +6,10 @@ import {
   createListCollection,
 } from '@ark-ui/solid';
 import clsx from 'clsx';
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon, XIcon } from 'lucide-solid';
 import { For, JSX, Show, createEffect, createMemo, createSignal } from 'solid-js';
 import { Portal } from 'solid-js/web';
+
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, XIcon } from '../icons';
 
 type ComboboxProps<T> = {
   label?: JSX.Element;

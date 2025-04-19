@@ -3,7 +3,6 @@ import type { DomainEvents, Product, ShoppingList, ShoppingListItem, Unit } from
 import { assert, hasProperty } from '@bectance/shared/utils';
 import { A, useParams } from '@solidjs/router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query';
-import { ArchiveIcon, CheckIcon, ChevronLeftIcon, ShoppingCartIcon, Trash2Icon, XIcon } from 'lucide-solid';
 import { For, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from 'solid-js';
 import { produce } from 'solid-js/store';
 import { Dynamic } from 'solid-js/web';
@@ -20,6 +19,7 @@ import { Combobox } from './components/combobox';
 import { Header as BaseHeader } from './components/header';
 import { Menu } from './components/menu';
 import { Spinner } from './components/spinner';
+import { ArchiveIcon, CheckIcon, ChevronLeftIcon, ShoppingCartIcon, Trash2Icon, XIcon } from './icons';
 import { useLongPress } from './utils/long-press';
 
 export { Header, Page };
