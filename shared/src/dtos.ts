@@ -14,7 +14,7 @@ export type ShoppingList = {
   id: string;
   name: string;
   date: string | null;
-  cost: string | null;
+  cost: number | null;
   items: ShoppingListItem[];
 };
 

@@ -43,6 +43,13 @@
       "when": 1744653202602,
       "tag": "0005_remove-shopping-list-item-quantity-not-null",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1745182953168,
+      "tag": "0006_numeric-number",
+      "breakpoints": true
     }
   ]
 }

@@ -3,9 +3,9 @@ import {
   PgEnum,
   boolean,
   check,
+  customType,
   date,
   integer,
-  numeric,
   pgEnum,
   pgTable,
   text,
@@ -20,13 +20,20 @@ export type Unit = PgEnumType<typeof unit>;
 
 const id = () => varchar({ length: 8 });
 
+// Thanks! https://github.com/drizzle-team/drizzle-orm/issues/1042#issuecomment-2224689025
+export const numericNumber = customType<{ data: number; driverData: string }>({
+  dataType: () => 'numeric',
+  fromDriver: (value: string) => Number.parseFloat(value),
+  toDriver: (value: number) => value.toString(),
+});
+
 export type Product = typeof products.$inferSelect;
 
 export const products = pgTable('products', {
   id: id().primaryKey(),
   name: varchar({ length: 255 }).notNull().unique(),
   unit: unit().notNull(),
-  defaultQuantity: integer().notNull(),
+  defaultQuantity: numericNumber().notNull(),
 });
 
 export type Stock = typeof stocks.$inferSelect;
@@ -34,7 +41,7 @@ export type Stock = typeof stocks.$inferSelect;
 export const stocks = pgTable('stocks', {
   id: id().primaryKey(),
   productId: id().notNull(),
-  quantity: integer().notNull(),
+  quantity: numericNumber().notNull(),
 });
 
 export const productStocksRelations = relations(stocks, ({ one }) => ({
@@ -50,7 +57,7 @@ export const shoppingList = pgTable('shopping_lists', {
   id: id().primaryKey(),
   name: varchar({ length: 255 }).notNull(),
   date: date(),
-  cost: numeric(),
+  cost: numericNumber(),
 });
 
 export const shoppingListsRelations = relations(shoppingList, ({ many }) => ({
@@ -66,7 +73,7 @@ export const shoppingListItems = pgTable(
     shoppingListId: id().notNull(),
     productId: id(),
     label: varchar({ length: 255 }),
-    quantity: integer(),
+    quantity: numericNumber(),
     checked: boolean().notNull(),
     position: integer().notNull(),
   },
@@ -103,7 +110,7 @@ export type Ingredient = typeof ingredients.$inferSelect;
 
 export const ingredients = pgTable('ingredients', {
   id: id().primaryKey(),
-  quantity: integer().notNull(),
+  quantity: numericNumber().notNull(),
   recipeId: id().notNull(),
   productId: id().notNull(),
 });
