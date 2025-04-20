@@ -40,7 +40,9 @@ export type Stock = typeof stocks.$inferSelect;
 
 export const stocks = pgTable('stocks', {
   id: id().primaryKey(),
-  productId: id().notNull(),
+  productId: id()
+    .notNull()
+    .references(() => products.id),
   quantity: numericNumber().notNull(),
 });
 
@@ -70,8 +72,10 @@ export const shoppingListItems = pgTable(
   'shopping_list_items',
   {
     id: id().primaryKey(),
-    shoppingListId: id().notNull(),
-    productId: id(),
+    shoppingListId: id()
+      .notNull()
+      .references(() => shoppingList.id),
+    productId: id().references(() => products.id),
     label: varchar({ length: 255 }),
     quantity: numericNumber(),
     checked: boolean().notNull(),
@@ -111,8 +115,12 @@ export type Ingredient = typeof ingredients.$inferSelect;
 export const ingredients = pgTable('ingredients', {
   id: id().primaryKey(),
   quantity: numericNumber().notNull(),
-  recipeId: id().notNull(),
-  productId: id().notNull(),
+  recipeId: id()
+    .notNull()
+    .references(() => recipes.id),
+  productId: id()
+    .notNull()
+    .references(() => products.id),
 });
 
 export const ingredientsRelations = relations(ingredients, ({ one }) => ({
