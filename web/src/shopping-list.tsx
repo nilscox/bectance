@@ -100,10 +100,10 @@ function Page() {
         </header>
 
         <ul class="list-disc list-inside">
-          <li>Curry de légumes</li>
-          <li>Tarte aux oignons</li>
-          <li>Soupe de butternut et potimarron</li>
-          <li>Salade</li>
+          <li>Dahl</li>
+          <li>Burgers</li>
+          <li>Poulet basquaise</li>
+          <li>Burritos</li>
         </ul>
       </section>
 
