@@ -1,17 +1,14 @@
 import { Checkbox as ArkCheckbox } from '@ark-ui/solid';
 import clsx from 'clsx';
-import { JSX } from 'solid-js';
 
 import { CheckIcon } from '../icons';
 
 export function Checkbox(props: {
-  label?: JSX.Element;
   disabled?: boolean;
   readOnly?: boolean;
   checked?: boolean;
   onChange?: (checked: boolean) => void;
   class?: string;
-  classes?: Partial<Record<'label', string>>;
 }) {
   return (
     <ArkCheckbox.Root
@@ -28,8 +25,6 @@ export function Checkbox(props: {
       </ArkCheckbox.Control>
 
       <ArkCheckbox.HiddenInput class="!fixed" />
-
-      <ArkCheckbox.Label class={props.classes?.label}>{props.label}</ArkCheckbox.Label>
     </ArkCheckbox.Root>
   );
 }

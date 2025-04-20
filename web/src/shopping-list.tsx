@@ -3,9 +3,8 @@ import type { DomainEvents, Product, ShoppingList, ShoppingListItem, Unit } from
 import { assert, hasProperty } from '@bectance/shared/utils';
 import { A, useParams } from '@solidjs/router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query';
-import { For, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from 'solid-js';
+import { For, createEffect, createMemo, createSignal, onCleanup, onMount } from 'solid-js';
 import { produce } from 'solid-js/store';
-import { Dynamic } from 'solid-js/web';
 
 import {
   createShoppingListItem,
@@ -19,8 +18,15 @@ import { Combobox } from './components/combobox';
 import { Header as BaseHeader } from './components/header';
 import { Menu } from './components/menu';
 import { Spinner } from './components/spinner';
-import { ArchiveIcon, CheckIcon, ChevronLeftIcon, ShoppingCartIcon, Trash2Icon, XIcon } from './icons';
-import { useLongPress } from './utils/long-press';
+import {
+  ArchiveIcon,
+  CheckIcon,
+  ChevronLeftIcon,
+  EditIcon,
+  EllipsisVerticalIcon,
+  ShoppingCartIcon,
+  Trash2Icon,
+} from './icons';
 import { createSearchIndex } from './utils/search';
 
 export { Header, Page };
@@ -41,7 +47,7 @@ function Header() {
         </A>
       }
       right={
-        <Menu onSelect={{}}>
+        <Menu trigger={<EllipsisVerticalIcon class="text-dim size-6" />} onSelect={{}}>
           <Menu.Item value="" icon={CheckIcon} label="Terminer" />
           <Menu.Item value="" icon={ArchiveIcon} label="Archiver" />
         </Menu>
@@ -66,8 +72,6 @@ function Page() {
   }));
 
   useShoppingListEventSource(() => params.listId);
-
-  const [showActions, setShowActions] = createSignal<ShoppingListItem>();
 
   const elements = new Map<ShoppingListItem, HTMLElement>();
 
@@ -112,32 +116,20 @@ function Page() {
           </div>
         </header>
 
-        <ul>
+        <ul class="divide-y divide-dim/10">
           <For each={query.data?.items}>
             {(item) => (
               <ShoppingListItem
                 ref={(ref) => void elements.set(item, ref)}
                 listId={params.listId}
                 item={item}
-                showActions={showActions() === item}
-                onShowActions={(show: boolean) => setShowActions(show ? item : undefined)}
               />
             )}
           </For>
 
           <li class="row gap-4 items-center py-0.5 px-1 rounded">
-            <Checkbox
-              label={
-                <AddItemCombobox
-                  list={query.data}
-                  products={productList.data ?? []}
-                  onHighlight={onHighlight}
-                />
-              }
-              readOnly
-              class="w-full"
-              classes={{ label: 'grow' }}
-            />
+            <Checkbox readOnly />
+            <AddItemCombobox list={query.data} products={productList.data ?? []} onHighlight={onHighlight} />
           </li>
         </ul>
       </section>
@@ -215,6 +207,7 @@ function AddItemCombobox(props: {
           addItem.mutate({ productId: items[0].value });
         }
       }}
+      class="grow"
     >
       <ArkCombobox.Control class="row items-center">
         <ArkCombobox.Input
@@ -242,18 +235,34 @@ function ShoppingListItem(props: {
   ref: (ref: HTMLLIElement) => void;
   listId: string;
   item: ShoppingListItem;
-  showActions: boolean;
-  onShowActions: (show: boolean) => void;
 }) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const longPress = useLongPress(200);
-
   const checkItem = useMutation(() => ({
     mutationFn: async ({ checked }: { checked: boolean }) => {
       await updateShoppingListItem(props.listId, props.item.id, { checked });
     },
   }));
 
+  return (
+    <li ref={props.ref} class="grid grid-cols-[auto_1fr_auto_auto] gap-4 items-center py-0.5 px-1">
+      <Checkbox
+        disabled={checkItem.isPending}
+        checked={props.item.checked}
+        onChange={(checked) => checkItem.mutate({ checked })}
+        class="w-full"
+      />
+
+      <span class="first-letter:capitalize min-w-32">{props.item.label}</span>
+
+      <span class="text-dim text-sm">{formatQuantity(props.item.quantity, props.item.unit)}</span>
+
+      <div class="row gap-2 items-center">
+        <ShoppingListItemMenu listId={props.listId} item={props.item} />
+      </div>
+    </li>
+  );
+}
+
+function ShoppingListItemMenu(props: { listId: string; item: ShoppingListItem }) {
   const deleteItem = useMutation(() => ({
     mutationFn: async () => {
       await deleteShoppingListItem(props.listId, props.item.id);
@@ -261,42 +270,18 @@ function ShoppingListItem(props: {
   }));
 
   return (
-    <li
-      ref={props.ref}
-      use:longPress={() => props.onShowActions(!props.showActions)}
-      class="row gap-4 items-center py-0.5 px-1 rounded"
-      classList={{ 'bg-zinc-100': props.showActions }}
-    >
-      <Checkbox
-        label={
-          <div class="row gap-1 items-center">
-            <span class="first-letter:capitalize min-w-32">{props.item.label}</span>
-
-            <span class="text-dim text-sm">{formatQuantity(props.item.quantity, props.item.unit)}</span>
-
-            <Show when={checkItem.isPending}>
-              <Spinner class="size-em ms-2 py-px" />
-            </Show>
-          </div>
-        }
-        disabled={checkItem.isPending}
-        checked={props.item.checked}
-        onChange={(checked) => checkItem.mutate({ checked })}
-        class="w-full"
-      />
-
-      <Show when={props.showActions}>
-        <div class="row gap-2 items-center">
-          <button type="button" disabled={deleteItem.isPending} onClick={() => deleteItem.mutate()}>
-            <Dynamic component={!deleteItem.isPending ? Trash2Icon : Spinner} class="size-4" />
-          </button>
-
-          <button type="button" onClick={() => props.onShowActions(false)}>
-            <XIcon class="size-4" />
-          </button>
-        </div>
-      </Show>
-    </li>
+    <>
+      <Menu
+        trigger={<EllipsisVerticalIcon class="text-dim size-4" />}
+        onSelect={{
+          delete: () => deleteItem.mutate(),
+          edit: () => alert('Not implemented'),
+        }}
+      >
+        <Menu.Item value="edit" icon={EditIcon} label="Éditer" />
+        <Menu.Item value="delete" icon={deleteItem.isPending ? Spinner : Trash2Icon} label="Supprimer" />
+      </Menu>
+    </>
   );
 }
 

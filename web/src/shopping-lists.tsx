@@ -9,7 +9,7 @@ import { Dialog } from './components/dialog';
 import { Header as BaseHeader } from './components/header';
 import { Input } from './components/input';
 import { Menu } from './components/menu';
-import { PlusIcon, ShoppingCartIcon } from './icons';
+import { EllipsisVerticalIcon, PlusIcon, ShoppingCartIcon } from './icons';
 
 export { Header, Page };
 
@@ -27,6 +27,7 @@ function Header() {
         }
         right={
           <Menu
+            trigger={<EllipsisVerticalIcon class="text-dim size-6" />}
             onSelect={{
               create: () => setCreateDialogOpen(true),
             }}

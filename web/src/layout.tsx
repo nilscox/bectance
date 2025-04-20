@@ -7,7 +7,7 @@ import * as shoppingListList from './shopping-lists';
 
 export function Layout(props: { children?: JSX.Element }) {
   return (
-    <div class="h-screen col overflow-hidden">
+    <div class="h-dvh col overflow-hidden">
       <Header />
       <main class="p-4 col flex-1 overflow-auto">{props.children}</main>
       <Footer />

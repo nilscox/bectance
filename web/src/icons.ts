@@ -4,6 +4,7 @@ export { default as ChevronDownIcon } from 'lucide-solid/icons/chevron-down';
 export { default as ChevronLeftIcon } from 'lucide-solid/icons/chevron-left';
 export { default as ChevronUpIcon } from 'lucide-solid/icons/chevron-up';
 export { default as CookingPotIcon } from 'lucide-solid/icons/cooking-pot';
+export { default as EditIcon } from 'lucide-solid/icons/edit';
 export { default as EllipsisVerticalIcon } from 'lucide-solid/icons/ellipsis-vertical';
 export { default as HouseIcon } from 'lucide-solid/icons/house';
 export { default as PlusIcon } from 'lucide-solid/icons/plus';
