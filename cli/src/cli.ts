@@ -32,6 +32,18 @@ product
   });
 
 product
+  .command('import')
+  .description('Import a list of products')
+  .argument('<json>', 'Products list to import')
+  .action(async (json) => {
+    console.log(json);
+    for (const product of JSON.parse(json)) {
+      console.debug('Importing', product);
+      await api('POST', '/product', { body: product });
+    }
+  });
+
+product
   .command('update')
   .description('Update an existing product')
   .argument('<name>', 'Name of the product', parseProductName)
