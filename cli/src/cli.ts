@@ -36,7 +36,6 @@ product
   .description('Import a list of products')
   .argument('<json>', 'Products list to import')
   .action(async (json) => {
-    console.log(json);
     for (const product of JSON.parse(json)) {
       console.debug('Importing', product);
       await api('POST', '/product', { body: product });
@@ -157,6 +156,17 @@ recipe
     await api('PUT', `/recipe/${recipeId}`, {
       body: { productId, quantity },
     });
+  });
+
+recipe
+  .command('import')
+  .description('Import a list of recipes')
+  .argument('<json>', 'Recipes list to import')
+  .action(async (json) => {
+    for (const recipe of JSON.parse(json)) {
+      console.debug('Importing', recipe);
+      await api('POST', '/recipe', { body: recipe });
+    }
   });
 
 const dish = new Command('dish');
