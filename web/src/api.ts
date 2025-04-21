@@ -1,4 +1,4 @@
-import { Product, ShoppingList } from '@bectance/shared/dtos';
+import { Product, Recipe, ShoppingList } from '@bectance/shared/dtos';
 
 export async function listProducts() {
   const response = await fetch('/api/product');
@@ -62,4 +62,12 @@ export async function deleteShoppingListItem(listId: string, itemId: string) {
   await fetch(`/api/shopping-list/${listId}/${itemId}`, {
     method: 'DELETE',
   });
+}
+
+export async function listRecipes() {
+  const response = await fetch(`/api/recipe`);
+
+  if (response.ok) {
+    return response.json() as Promise<Recipe[]>;
+  }
 }
