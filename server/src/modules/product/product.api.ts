@@ -5,7 +5,8 @@ import express, { Response } from 'express';
 import { z } from 'zod';
 import { validateRequestBody } from 'zod-express-middleware';
 
-import { getQueryParam } from '../../utils.js';
+import { db } from '../../persistence/database.js';
+import { createId, getQueryParam } from '../../utils.js';
 import { createProduct, getProduct, listProducts, updateProduct } from './product.domain.js';
 
 export const product = express.Router();
@@ -19,13 +20,13 @@ export function mapProduct(product: Product): dtos.Product {
 }
 
 product.get('/', async (req, res: Response<dtos.Product[]>) => {
-  const products = await listProducts({ name: getQueryParam(req, 'name') });
+  const products = await listProducts(db, { name: getQueryParam(req, 'name') });
 
   res.json(products.map(mapProduct));
 });
 
 product.get('/:productId', async (req, res: Response<dtos.Product>) => {
-  const product = await getProduct(req.params.productId);
+  const product = await getProduct(db, req.params.productId);
 
   res.json(mapProduct(product));
 });
@@ -37,7 +38,10 @@ const createProductBody = z.object({
 });
 
 product.post('/', validateRequestBody(createProductBody), async (req, res) => {
-  await createProduct(req.body);
+  const id = createId();
+
+  await createProduct(db, { id, ...req.body });
+
   res.status(201).end();
 });
 
@@ -46,7 +50,7 @@ const updateProductBody = createProductBody.partial();
 product.put('/:productId', validateRequestBody(updateProductBody), async (req, res) => {
   assert(req.params.productId);
 
-  await updateProduct(req.params.productId, req.body);
+  await updateProduct(db, req.params.productId, req.body);
 
   res.end();
 });

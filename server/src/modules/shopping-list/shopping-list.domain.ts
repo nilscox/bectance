@@ -2,12 +2,12 @@ import { and, asc, eq, sql } from 'drizzle-orm';
 
 import { NotFoundError } from '../../errors.js';
 import { emitDomainEvent } from '../../events.js';
-import { db } from '../../persistence/database.js';
+import { Database } from '../../persistence/database.js';
 import { shoppingList, shoppingListItems } from '../../persistence/schema.js';
 import { defined } from '../../utils.js';
 import { findProduct } from '../product/product.domain.js';
 
-export async function listShoppingLists(filters?: { name?: string }) {
+export async function listShoppingLists(db: Database, filters?: { name?: string }) {
   let where = and();
 
   if (filters?.name !== undefined) {
@@ -26,7 +26,7 @@ export async function listShoppingLists(filters?: { name?: string }) {
   });
 }
 
-export async function getShoppingList(listId: string) {
+export async function getShoppingList(db: Database, listId: string) {
   const list = await db.query.shoppingList.findFirst({
     where: eq(shoppingList.id, listId),
     with: {
@@ -42,7 +42,7 @@ export async function getShoppingList(listId: string) {
   return defined(list, new NotFoundError('Cannot find shopping list', { id: listId }));
 }
 
-export async function createShoppingList(shoppingListId: string, shoppingListName: string) {
+export async function createShoppingList(db: Database, shoppingListId: string, shoppingListName: string) {
   await db.insert(shoppingList).values({
     id: shoppingListId,
     name: shoppingListName,
@@ -50,6 +50,7 @@ export async function createShoppingList(shoppingListId: string, shoppingListNam
 }
 
 export async function createShoppingListItem(
+  db: Database,
   listId: string,
   itemId: string,
   param: { productId: string } | { label: string },
@@ -58,7 +59,7 @@ export async function createShoppingListItem(
   const productId = 'productId' in param ? param.productId : undefined;
   const label = 'label' in param ? param.label : undefined;
 
-  const product = productId ? await findProduct(productId) : undefined;
+  const product = productId ? await findProduct(db, productId) : undefined;
 
   const count = await db.$count(shoppingListItems, eq(shoppingListItems.shoppingListId, listId));
 
@@ -85,6 +86,7 @@ export async function createShoppingListItem(
 }
 
 export async function updateShoppingListItem(
+  db: Database,
   itemId: string,
   options: Partial<{ quantity: number; checked: boolean }>,
 ) {
@@ -117,7 +119,7 @@ export async function updateShoppingListItem(
   });
 }
 
-export async function deleteShoppingListItem(shoppingListId: string, itemId: string) {
+export async function deleteShoppingListItem(db: Database, shoppingListId: string, itemId: string) {
   await db.delete(shoppingListItems).where(eq(shoppingListItems.id, itemId));
   await db.execute(sql`CALL reconcile_shopping_list_item_position(${shoppingListId})`);
 

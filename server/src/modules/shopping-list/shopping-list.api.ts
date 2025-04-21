@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { validateRequestBody } from 'zod-express-middleware';
 
 import { addDomainEventListener } from '../../events.js';
+import { db } from '../../persistence/database.js';
 import { Product, ShoppingList, ShoppingListItem } from '../../persistence/schema.js';
 import { createId, getQueryParam } from '../../utils.js';
 import {
@@ -37,13 +38,13 @@ function mapShoppingList(
 }
 
 shoppingList.get('/', async (req, res: Response<dtos.ShoppingList[]>) => {
-  const lists = await listShoppingLists({ name: getQueryParam(req, 'name') });
+  const lists = await listShoppingLists(db, { name: getQueryParam(req, 'name') });
 
   res.json(lists.map(mapShoppingList));
 });
 
 shoppingList.get('/:listId', async (req, res: Response<dtos.ShoppingList>) => {
-  const list = await getShoppingList(req.params.listId);
+  const list = await getShoppingList(db, req.params.listId);
 
   res.json(mapShoppingList(list));
 });
@@ -83,7 +84,7 @@ const createShoppingListBody = z.object({
 shoppingList.post('/', validateRequestBody(createShoppingListBody), async (req, res) => {
   const listId = createId();
 
-  await createShoppingList(listId, req.body.name);
+  await createShoppingList(db, listId, req.body.name);
 
   res.status(201).send(listId);
 });
@@ -105,7 +106,7 @@ const createShoppingListItemBody = z.union([
 shoppingList.post('/:listId', validateRequestBody(createShoppingListItemBody), async (req, res) => {
   assert(req.params.listId);
 
-  res.json(await createShoppingListItem(req.params.listId, createId(), req.body, req.body));
+  res.json(await createShoppingListItem(db, req.params.listId, createId(), req.body, req.body));
 });
 
 const updateShoppingListItemBody = z
@@ -119,12 +120,12 @@ shoppingList.put('/:listId/:itemId', validateRequestBody(updateShoppingListItemB
   assert(req.params.listId);
   assert(req.params.itemId);
 
-  res.json(await updateShoppingListItem(req.params.itemId, req.body));
+  res.json(await updateShoppingListItem(db, req.params.itemId, req.body));
 });
 
 shoppingList.delete('/:listId/:itemId', async (req, res) => {
   assert(req.params.listId);
   assert(req.params.itemId);
 
-  res.json(await deleteShoppingListItem(req.params.listId, req.params.itemId));
+  res.json(await deleteShoppingListItem(db, req.params.listId, req.params.itemId));
 });

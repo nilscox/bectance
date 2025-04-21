@@ -3,6 +3,7 @@ import express, { Response } from 'express';
 import { z } from 'zod';
 import { validateRequestBody } from 'zod-express-middleware';
 
+import { db } from '../../persistence/database.js';
 import { assert, createId, getQueryParam } from '../../utils.js';
 import { addIngredient, createRecipe, getIngredient, listRecipes, mapIngredient } from './recipe.domain.js';
 
@@ -25,7 +26,9 @@ const createRecipeBody = z.object({
 });
 
 recipe.post('/', validateRequestBody(createRecipeBody), async (req, res) => {
-  await createRecipe(req.body);
+  const id = createId();
+
+  await createRecipe(db, { id, ...req.body });
 
   res.status(201).end();
 });
@@ -42,7 +45,7 @@ recipe.put(
     assert(req.params.recipeId);
 
     const id = createId();
-    await addIngredient(req.params.recipeId, { id, ...req.body });
+    await addIngredient(db, req.params.recipeId, { id, ...req.body });
 
     const ingredient = await getIngredient(id);
 

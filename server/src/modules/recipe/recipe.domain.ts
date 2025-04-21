@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 
 import { NotFoundError } from '../../errors.js';
-import { db } from '../../persistence/database.js';
+import { Database, db } from '../../persistence/database.js';
 import { Ingredient, Product, ingredients, recipes } from '../../persistence/schema.js';
 import { createId, defined } from '../../utils.js';
 import { mapProduct } from '../product/product.api.js';
@@ -25,15 +25,19 @@ export async function listRecipes(filters?: { name?: string }) {
   });
 }
 
-export async function createRecipe({ name, description }: { name: string; description: string }) {
+export async function createRecipe(
+  db: Database,
+  { id, name, description }: { id: string; name: string; description: string },
+) {
   await db.insert(recipes).values({
-    id: createId(),
+    id,
     name,
     description,
   });
 }
 
 export async function addIngredient(
+  db: Database,
   recipeId: string,
   { id, productId, quantity }: { id: string; productId: string; quantity: number },
 ) {

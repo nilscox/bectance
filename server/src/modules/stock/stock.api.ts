@@ -5,6 +5,7 @@ import express, { Response } from 'express';
 import { z } from 'zod';
 import { validateRequestBody } from 'zod-express-middleware';
 
+import { db } from '../../persistence/database.js';
 import { Stock } from '../../persistence/schema.js';
 import { mapProduct } from '../product/product.api.js';
 import { getStock, upsertStock } from './stock.domain.js';
@@ -19,7 +20,7 @@ function mapStock(stock: Stock & { product: Product }): dtos.ProductStock {
 }
 
 stock.get('/', async (req, res: Response<dtos.ProductStock[]>) => {
-  const stock = await getStock();
+  const stock = await getStock(db);
 
   res.json(stock.map(mapStock));
 });
@@ -31,7 +32,7 @@ const updateStockBody = z.object({
 stock.put('/:productId', validateRequestBody(updateStockBody), async (req, res) => {
   assert(req.params.productId);
 
-  await upsertStock(req.params.productId, req.body.quantity);
+  await upsertStock(db, req.params.productId, req.body.quantity);
 
   res.end();
 });
