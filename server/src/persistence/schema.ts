@@ -118,6 +118,7 @@ export const ingredients = pgTable('ingredients', {
   recipeId: id()
     .notNull()
     .references(() => recipes.id),
+  dishHistoryId: id().references(() => dishHistory.id),
   productId: id()
     .notNull()
     .references(() => products.id),
@@ -128,8 +129,26 @@ export const ingredientsRelations = relations(ingredients, ({ one }) => ({
     fields: [ingredients.recipeId],
     references: [recipes.id],
   }),
+  dishHistory: one(dishHistory, {
+    fields: [ingredients.dishHistoryId],
+    references: [dishHistory.id],
+  }),
   product: one(products, {
     fields: [ingredients.productId],
     references: [products.id],
   }),
+}));
+
+export type DishHistory = typeof dishHistory.$inferSelect;
+
+export const dishHistory = pgTable('dish_history', {
+  id: id().primaryKey(),
+  recipeId: id()
+    .notNull()
+    .references(() => recipes.id),
+  description: text().notNull(),
+});
+
+export const dishHistoryRelations = relations(dishHistory, ({ many }) => ({
+  ingredients: many(ingredients),
 }));

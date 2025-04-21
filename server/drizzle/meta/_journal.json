@@ -57,6 +57,13 @@
       "when": 1745188648850,
       "tag": "0007_add-foreign-keys",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1745196661099,
+      "tag": "0008_add-dish-history",
+      "breakpoints": true
     }
   ]
 }
