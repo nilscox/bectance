@@ -65,9 +65,17 @@ export async function deleteShoppingListItem(listId: string, itemId: string) {
 }
 
 export async function listRecipes() {
-  const response = await fetch(`/api/recipe`);
+  const response = await fetch('/api/recipe');
 
   if (response.ok) {
     return response.json() as Promise<Recipe[]>;
+  }
+}
+
+export async function getRecipe(recipeId: string) {
+  const response = await fetch(`/api/recipe/${recipeId}`);
+
+  if (response.ok) {
+    return response.json() as Promise<Recipe>;
   }
 }

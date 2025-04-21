@@ -35,8 +35,10 @@ export type Recipe = {
 
 export type Ingredient = {
   id: string;
+  productId?: string;
   quantity: number;
-  product: Product;
+  label: string;
+  unit: string;
 };
 
 export type Dish = {

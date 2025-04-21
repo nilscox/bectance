@@ -12,7 +12,8 @@
     "@bectance/shared": "workspace:^",
     "commander": "^13.1.0",
     "console-table-printer": "^2.12.1",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "front-matter": "^4.0.2"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",

@@ -1,9 +1,12 @@
 import 'dotenv/config';
 
+import fs from 'node:fs/promises';
+
 import { Dish, Product, ProductStock, Recipe, ShoppingList, Unit } from '@bectance/shared/dtos';
 import { toObject } from '@bectance/shared/utils';
 import { Command, InvalidArgumentError } from 'commander';
 import { Table } from 'console-table-printer';
+import frontMatter from 'front-matter';
 
 import { api } from './api';
 
@@ -160,12 +163,38 @@ recipe
 
 recipe
   .command('import')
-  .description('Import a list of recipes')
-  .argument('<json>', 'Recipes list to import')
-  .action(async (json) => {
-    for (const recipe of JSON.parse(json)) {
-      console.debug('Importing', recipe);
-      await api('POST', '/recipe', { body: recipe });
+  .description('Import a recipe')
+  .argument('<path>', 'Markdown file')
+  .action(async (path) => {
+    const products = await api<Product[]>('GET', '/product');
+    const file = (await fs.readFile(path)).toString('utf-8');
+
+    const { attributes, body } = frontMatter<{
+      name: string;
+      time: string;
+      tags: string;
+      link: string;
+      ingredients: Array<{ label: string; quantity: number; unit?: string }>;
+    }>(file);
+
+    const { id } = await api<{ id: string }>('POST', '/recipe', {
+      body: {
+        name: attributes.name,
+        description: body,
+      },
+    });
+
+    for (const ingredient of attributes.ingredients) {
+      const product = products.find((product) => product.name === ingredient.label);
+
+      await api('PUT', `/recipe/${id}`, {
+        body: {
+          productId: product?.id,
+          label: ingredient.unit ? ingredient.label : undefined,
+          unit: ingredient.unit,
+          quantity: ingredient.quantity,
+        },
+      });
     }
   });
 

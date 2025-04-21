@@ -1,5 +1,5 @@
 import { Combobox as ArkCombobox, createListCollection } from '@ark-ui/solid';
-import type { DomainEvents, Product, ShoppingList, ShoppingListItem, Unit } from '@bectance/shared/dtos';
+import type { DomainEvents, Product, ShoppingList, ShoppingListItem } from '@bectance/shared/dtos';
 import { assert, hasProperty } from '@bectance/shared/utils';
 import { A, useParams } from '@solidjs/router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query';
@@ -285,7 +285,7 @@ function ShoppingListItemMenu(props: { listId: string; item: ShoppingListItem })
   );
 }
 
-export function formatQuantity(quantity?: number, unit?: Unit) {
+export function formatQuantity(quantity?: number, unit?: string) {
   if (!quantity || !unit) {
     return '';
   }
@@ -295,6 +295,10 @@ export function formatQuantity(quantity?: number, unit?: Unit) {
   }
 
   if (unit === 'liter') {
+    if (quantity < 1) {
+      return `${quantity * 1000}mL`;
+    }
+
     return `${quantity}L`;
   }
 
@@ -305,6 +309,8 @@ export function formatQuantity(quantity?: number, unit?: Unit) {
 
     return `${quantity}g`;
   }
+
+  return `${quantity}${unit}`;
 }
 
 function useProductList() {

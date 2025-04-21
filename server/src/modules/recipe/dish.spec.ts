@@ -51,8 +51,9 @@ describe('dish', () => {
       description: '',
     });
 
-    await addIngredient(db, 'recipeId', {
+    await addIngredient(db, {
       id: 'ingredientId',
+      recipeId: 'recipeId',
       productId: 'productId',
       quantity: 1,
     });

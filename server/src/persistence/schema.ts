@@ -113,17 +113,24 @@ export const recipesRelations = relations(recipes, ({ many }) => ({
 
 export type Ingredient = typeof ingredients.$inferSelect;
 
-export const ingredients = pgTable('ingredients', {
-  id: id().primaryKey(),
-  quantity: numericNumber().notNull(),
-  recipeId: id()
-    .notNull()
-    .references(() => recipes.id),
-  dishHistoryId: id().references(() => dishHistory.id),
-  productId: id()
-    .notNull()
-    .references(() => products.id),
-});
+export const ingredients = pgTable(
+  'ingredients',
+  {
+    id: id().primaryKey(),
+    quantity: numericNumber().notNull(),
+    recipeId: id()
+      .notNull()
+      .references(() => recipes.id),
+    dishHistoryId: id().references(() => dishHistory.id),
+    productId: id().references(() => products.id),
+    label: varchar({ length: 255 }),
+    unit: varchar({ length: 255 }),
+  },
+  () => [
+    check('ingredients_product_id_xor_label', sql`("product_id" IS NULL) != ("label" IS NULL)`),
+    check('ingredients_label_and_unit', sql`("label" IS NULL) = ("unit" IS NULL)`),
+  ],
+);
 
 export const ingredientsRelations = relations(ingredients, ({ one }) => ({
   recipe: one(recipes, {

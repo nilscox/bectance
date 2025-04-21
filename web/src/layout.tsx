@@ -2,7 +2,8 @@ import { A, useMatch } from '@solidjs/router';
 import { JSX, Show } from 'solid-js';
 
 import { CookingPotIcon, HouseIcon, ShoppingCartIcon } from './icons';
-import * as recipeList from './recipes';
+import * as recipe from './recipe';
+import * as recipeList from './recipe-list';
 import * as shoppingList from './shopping-list';
 import * as shoppingListList from './shopping-lists';
 
@@ -19,9 +20,10 @@ export function Layout(props: { children?: JSX.Element }) {
 function Header() {
   return (
     <>
+      <Route path="/recipe" component={recipeList.Header} />
+      <Route path="/recipe/:recipeId" component={recipe.Header} />
       <Route path="/list" component={shoppingListList.Header} />
       <Route path="/list/:listId" component={shoppingList.Header} />
-      <Route path="/recipe" component={recipeList.Header} />
     </>
   );
 }

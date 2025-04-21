@@ -12,7 +12,7 @@ import { mapIngredient } from './recipe.domain.js';
 export const dish = express.Router();
 
 function mapDish(
-  dish: DishHistory & { recipe: Recipe; ingredients: Array<Ingredient & { product: Product }> },
+  dish: DishHistory & { recipe: Recipe; ingredients: Array<Ingredient & { product: Product | null }> },
 ): dtos.Dish {
   return {
     id: dish.id,

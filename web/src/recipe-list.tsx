@@ -1,3 +1,4 @@
+import { A } from '@solidjs/router';
 import { useQuery } from '@tanstack/solid-query';
 import { For } from 'solid-js';
 
@@ -31,7 +32,13 @@ function Page() {
   return (
     <section>
       <ul class="list-disc list-inside">
-        <For each={query.data}>{(recipe) => <li class="truncate">{recipe.name}</li>}</For>
+        <For each={query.data}>
+          {(recipe) => (
+            <li class="truncate">
+              <A href={`/recipe/${recipe.id}`}>{recipe.name}</A>
+            </li>
+          )}
+        </For>
       </ul>
     </section>
   );

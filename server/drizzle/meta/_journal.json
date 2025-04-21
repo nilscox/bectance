@@ -71,6 +71,13 @@
       "when": 1745232192442,
       "tag": "0009_increase-id-length",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1745252420566,
+      "tag": "0010_ingredient-product-nullable",
+      "breakpoints": true
     }
   ]
 }
