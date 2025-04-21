@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 
 import { BadRequestError, NotFoundError } from './errors.js';
 import { product } from './modules/product/product.api.js';
+import { dish } from './modules/recipe/dish.api.js';
 import { recipe } from './modules/recipe/recipe.api.js';
 import { shoppingList } from './modules/shopping-list/shopping-list.api.js';
 import { stock } from './modules/stock/stock.api.js';
@@ -14,6 +15,7 @@ api.use('/product', product);
 api.use('/stock', stock);
 api.use('/shopping-list', shoppingList);
 api.use('/recipe', recipe);
+api.use('/dish', dish);
 
 app.use(express.json());
 app.use(api);

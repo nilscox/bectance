@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { Product, ProductStock, Recipe, ShoppingList, Unit } from '@bectance/shared/dtos';
+import { Dish, Product, ProductStock, Recipe, ShoppingList, Unit } from '@bectance/shared/dtos';
 import { toObject } from '@bectance/shared/utils';
 import { Command, InvalidArgumentError } from 'commander';
 import { Table } from 'console-table-printer';
@@ -131,8 +131,8 @@ recipe
     const recipes = await api<Recipe[]>('GET', `/recipe`);
 
     printTable(
-      ['Name'],
-      recipes.map(({ name }) => [name]),
+      ['ID', 'Name'],
+      recipes.map(({ id, name }) => [id, name]),
     );
   });
 
@@ -159,12 +159,45 @@ recipe
     });
   });
 
+const dish = new Command('dish');
+
+dish
+  .command('list')
+  .description('List all dishes')
+  .action(async () => {
+    const dishes = await api<Dish[]>('GET', `/dish`);
+
+    printTable(
+      ['ID', 'name', 'date'],
+      dishes.map(({ id, name, date }) => [id, name, date]),
+    );
+  });
+
+dish
+  .command('create')
+  .description('Create a new dish (an instance of a recipe)')
+  .requiredOption('--recipeId <id>', 'Identifier of the recipe')
+  .action(async ({ recipeId }) => {
+    await api<Dish>('POST', '/dish', { body: { recipeId } });
+  });
+
+dish
+  .command('update-quantity')
+  .description("Update a dish's quantities")
+  .argument('<dishId>', 'Dish identifier')
+  .requiredOption('--ingredient <name>', 'Name of the ingredient to update', parseProductName)
+  .requiredOption('--quantity <quantity>', 'Quantity to set', parsePositiveInteger)
+  .action(async (dishId, { ingredient: productId, quantity }) => {
+    await api<Dish>('PUT', `/dish/${dishId}`, { body: { quantities: {} } });
+  });
+
 const program = new Command();
 
 program.addCommand(product);
 program.addCommand(stock);
 program.addCommand(list);
 program.addCommand(recipe);
+program.addCommand(dish);
 
 program.hook('preAction', async function (_, action) {
   action.processedArgs = await Promise.all(action.processedArgs);

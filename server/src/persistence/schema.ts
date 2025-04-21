@@ -9,6 +9,7 @@ import {
   pgEnum,
   pgTable,
   text,
+  timestamp,
   unique,
   varchar,
 } from 'drizzle-orm/pg-core';
@@ -18,7 +19,7 @@ type PgEnumType<T> = T extends PgEnum<infer E> ? E[number] : never;
 export const unit = pgEnum('unit', ['unit', 'gram', 'liter']);
 export type Unit = PgEnumType<typeof unit>;
 
-const id = () => varchar({ length: 8 });
+const id = () => varchar({ length: 16 });
 
 // Thanks! https://github.com/drizzle-team/drizzle-orm/issues/1042#issuecomment-2224689025
 export const numericNumber = customType<{ data: number; driverData: string }>({
@@ -143,12 +144,16 @@ export type DishHistory = typeof dishHistory.$inferSelect;
 
 export const dishHistory = pgTable('dish_history', {
   id: id().primaryKey(),
+  date: timestamp().notNull(),
   recipeId: id()
     .notNull()
     .references(() => recipes.id),
-  description: text().notNull(),
 });
 
-export const dishHistoryRelations = relations(dishHistory, ({ many }) => ({
+export const dishHistoryRelations = relations(dishHistory, ({ one, many }) => ({
+  recipe: one(recipes, {
+    fields: [dishHistory.recipeId],
+    references: [recipes.id],
+  }),
   ingredients: many(ingredients),
 }));

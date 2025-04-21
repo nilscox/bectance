@@ -39,6 +39,14 @@ export type Ingredient = {
   product: Product;
 };
 
+export type Dish = {
+  id: string;
+  date: string;
+  recipeId: string;
+  name: string;
+  ingredients: Ingredient[];
+};
+
 export type DomainEvents = {
   shoppingListItemCreated: {
     id: string;

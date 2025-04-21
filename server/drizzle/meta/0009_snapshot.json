@@ -1,6 +1,6 @@
 {
-  "id": "cdb6d6b8-bf9c-486c-b26d-1dec42652792",
-  "prevId": "3530583e-151b-412c-8450-66cb5bd8144e",
+  "id": "a01ac4dc-3dea-4b0d-a634-4ad7f2bfc332",
+  "prevId": "cdb6d6b8-bf9c-486c-b26d-1dec42652792",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -10,13 +10,19 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": true,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "timestamp",
+          "primaryKey": false,
           "notNull": true
         },
         "recipe_id": {
           "name": "recipe_id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": false,
           "notNull": true
         }
@@ -49,7 +55,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": true,
           "notNull": true
         },
@@ -61,19 +67,19 @@
         },
         "recipe_id": {
           "name": "recipe_id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": false,
           "notNull": true
         },
         "dish_history_id": {
           "name": "dish_history_id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": false,
           "notNull": false
         },
         "product_id": {
           "name": "product_id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": false,
           "notNull": true
         }
@@ -132,7 +138,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": true,
           "notNull": true
         },
@@ -178,7 +184,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": true,
           "notNull": true
         },
@@ -209,7 +215,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": true,
           "notNull": true
         },
@@ -246,19 +252,19 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": true,
           "notNull": true
         },
         "shopping_list_id": {
           "name": "shopping_list_id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": false,
           "notNull": true
         },
         "product_id": {
           "name": "product_id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": false,
           "notNull": false
         },
@@ -342,13 +348,13 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": true,
           "notNull": true
         },
         "product_id": {
           "name": "product_id",
-          "type": "varchar(8)",
+          "type": "varchar(16)",
           "primaryKey": false,
           "notNull": true
         },
