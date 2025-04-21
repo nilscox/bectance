@@ -1,0 +1,1 @@
+ALTER TABLE "products" ADD COLUMN "name_plural" varchar(255);

@@ -33,6 +33,7 @@ export type Product = typeof products.$inferSelect;
 export const products = pgTable('products', {
   id: id().primaryKey(),
   name: varchar({ length: 255 }).notNull().unique(),
+  namePlural: varchar({ length: 255 }),
   unit: unit().notNull(),
   defaultQuantity: numericNumber().notNull(),
 });

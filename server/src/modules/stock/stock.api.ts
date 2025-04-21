@@ -1,12 +1,11 @@
 import * as dtos from '@bectance/shared/dtos';
-import { Product } from '@bectance/shared/dtos';
 import assert from 'assert';
 import express, { Response } from 'express';
 import { z } from 'zod';
 import { validateRequestBody } from 'zod-express-middleware';
 
 import { db } from '../../persistence/database.js';
-import { Stock } from '../../persistence/schema.js';
+import { Product, Stock } from '../../persistence/schema.js';
 import { mapProduct } from '../product/product.api.js';
 import { getStock, upsertStock } from './stock.domain.js';
 

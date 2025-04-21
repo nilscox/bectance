@@ -32,6 +32,7 @@ function mapShoppingList(
       quantity: item.quantity ?? undefined,
       checked: item.checked,
       label: (item.product?.name ?? item.label) as string,
+      labelPlural: item.product?.namePlural ?? undefined,
       unit: item.product?.unit,
     })),
   };

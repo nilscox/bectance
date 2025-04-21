@@ -3,6 +3,7 @@ export type Unit = 'unit' | 'gram' | 'liter';
 export type Product = {
   id: string;
   name: string;
+  namePlural?: string;
   unit: Unit;
 };
 
@@ -21,6 +22,7 @@ export type ShoppingList = {
 export type ShoppingListItem = {
   id: string;
   label: string;
+  labelPlural?: string;
   checked: boolean;
   quantity?: number;
   unit?: Unit;
@@ -38,6 +40,7 @@ export type Ingredient = {
   productId?: string;
   quantity: number;
   label: string;
+  labelPlural?: string;
   unit: string;
 };
 

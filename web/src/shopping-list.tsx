@@ -27,6 +27,7 @@ import {
   ShoppingCartIcon,
   Trash2Icon,
 } from './icons';
+import { formatLabel, formatQuantity } from './utils/format-quantity';
 import { createSearchIndex } from './utils/search';
 
 export { Header, Page };
@@ -251,7 +252,9 @@ function ShoppingListItem(props: {
         class="w-full"
       />
 
-      <span class="first-letter:capitalize min-w-32">{props.item.label}</span>
+      <span class="first-letter:capitalize min-w-32">
+        {formatLabel(props.item.quantity, props.item.label, props.item.labelPlural)}
+      </span>
 
       <span class="text-dim text-sm">{formatQuantity(props.item.quantity, props.item.unit)}</span>
 
@@ -283,34 +286,6 @@ function ShoppingListItemMenu(props: { listId: string; item: ShoppingListItem })
       </Menu>
     </>
   );
-}
-
-export function formatQuantity(quantity?: number, unit?: string) {
-  if (!quantity || !unit) {
-    return '';
-  }
-
-  if (unit === 'unit') {
-    return quantity;
-  }
-
-  if (unit === 'liter') {
-    if (quantity < 1) {
-      return `${quantity * 1000}mL`;
-    }
-
-    return `${quantity}L`;
-  }
-
-  if (unit === 'gram') {
-    if (quantity >= 1000) {
-      return `${quantity / 1000}Kg`;
-    }
-
-    return `${quantity}g`;
-  }
-
-  return `${quantity}${unit}`;
 }
 
 function useProductList() {

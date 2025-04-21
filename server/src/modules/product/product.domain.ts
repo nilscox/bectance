@@ -28,18 +28,13 @@ export async function getProduct(db: Database, productId: string) {
 
 export async function createProduct(
   db: Database,
-  options: { id: string; name: string; unit: Unit; defaultQuantity: number },
+  values: { id: string; name: string; namePlural?: string; unit: Unit; defaultQuantity: number },
 ) {
-  if (await productExists(db, options.name)) {
-    throw new BadRequestError('Product already exists', { name: options.name });
+  if (await productExists(db, values.name)) {
+    throw new BadRequestError('Product already exists', { name: values.name });
   }
 
-  await db.insert(products).values({
-    id: options.id,
-    name: options.name,
-    unit: options.unit,
-    defaultQuantity: options.defaultQuantity,
-  });
+  await db.insert(products).values(values);
 }
 
 export async function updateProduct(

@@ -77,6 +77,7 @@ export function mapIngredient(ingredient: Ingredient & { product: Product | null
     id: ingredient.id,
     productId: ingredient.product?.id,
     label: ingredient.product?.name ?? defined(ingredient.label),
+    labelPlural: ingredient.product?.namePlural ?? undefined,
     unit: ingredient.product?.unit ?? defined(ingredient.unit),
     quantity: ingredient.quantity,
   };

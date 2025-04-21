@@ -5,7 +5,7 @@ import { For } from 'solid-js';
 import { getRecipe } from './api';
 import { Header as BaseHeader } from './components/header';
 import { ChevronLeftIcon, CookingPotIcon } from './icons';
-import { formatQuantity } from './shopping-list';
+import { formatLabel, formatQuantity } from './utils/format-quantity';
 
 export { Header, Page };
 
@@ -54,7 +54,7 @@ function Page() {
             {(ingredient) => (
               <>
                 <div class="text-dim text-end">{formatQuantity(ingredient.quantity, ingredient.unit)}</div>
-                <div>{ingredient.label}</div>
+                <div>{formatLabel(ingredient.quantity, ingredient.label, ingredient.labelPlural)}</div>
               </>
             )}
           </For>

@@ -185,7 +185,9 @@ recipe
     });
 
     for (const ingredient of attributes.ingredients) {
-      const product = products.find((product) => product.name === ingredient.label);
+      const product = products.find(
+        (product) => product.name === ingredient.label || product.namePlural === ingredient.label,
+      );
 
       await api('PUT', `/recipe/${id}`, {
         body: {
@@ -218,16 +220,6 @@ dish
   .requiredOption('--recipeId <id>', 'Identifier of the recipe')
   .action(async ({ recipeId }) => {
     await api<Dish>('POST', '/dish', { body: { recipeId } });
-  });
-
-dish
-  .command('update-quantity')
-  .description("Update a dish's quantities")
-  .argument('<dishId>', 'Dish identifier')
-  .requiredOption('--ingredient <name>', 'Name of the ingredient to update', parseProductName)
-  .requiredOption('--quantity <quantity>', 'Quantity to set', parsePositiveInteger)
-  .action(async (dishId, { ingredient: productId, quantity }) => {
-    await api<Dish>('PUT', `/dish/${dishId}`, { body: { quantities: {} } });
   });
 
 const program = new Command();

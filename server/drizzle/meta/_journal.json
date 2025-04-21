@@ -78,6 +78,13 @@
       "when": 1745252420566,
       "tag": "0010_ingredient-product-nullable",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1745254668654,
+      "tag": "0011_add-product-name-plural",
+      "breakpoints": true
     }
   ]
 }
