@@ -27,11 +27,11 @@ export function formatQuantity(quantity?: number, unit?: string) {
 }
 
 export function formatLabel(quantity?: number, label?: string, labelPlural?: string) {
-  if (!quantity || !label) {
+  if (!label) {
     return null;
   }
 
-  if (quantity > 1 && labelPlural) {
+  if (quantity && quantity > 1 && labelPlural) {
     return labelPlural;
   }
 
