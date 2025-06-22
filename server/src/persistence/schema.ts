@@ -5,12 +5,10 @@ import {
   check,
   customType,
   date,
-  integer,
   pgEnum,
   pgTable,
   text,
   timestamp,
-  unique,
   varchar,
 } from 'drizzle-orm/pg-core';
 
@@ -62,6 +60,7 @@ export const shoppingList = pgTable('shopping_lists', {
   name: varchar({ length: 255 }).notNull(),
   date: date(),
   cost: numericNumber(),
+  sortedItemIds: id().array().notNull(),
 });
 
 export const shoppingListsRelations = relations(shoppingList, ({ many }) => ({
@@ -81,12 +80,8 @@ export const shoppingListItems = pgTable(
     label: varchar({ length: 255 }),
     quantity: numericNumber(),
     checked: boolean().notNull(),
-    position: integer().notNull(),
   },
-  (table) => [
-    unique('position_unique').on(table.shoppingListId, table.position),
-    check('shopping_list_items_product_id_xor_label', sql`("product_id" IS NULL) != ("label" IS NULL)`),
-  ],
+  () => [check('shopping_list_items_product_id_xor_label', sql`("product_id" IS NULL) != ("label" IS NULL)`)],
 );
 
 export const shoppingListItemsRelations = relations(shoppingListItems, ({ one }) => ({

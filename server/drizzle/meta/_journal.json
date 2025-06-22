@@ -85,6 +85,20 @@
       "when": 1745254668654,
       "tag": "0011_add-product-name-plural",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1748778586291,
+      "tag": "0012_drop-shopping-list-item-position",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1748778946860,
+      "tag": "0013_add-shopping-list-storted-item-ids",
+      "breakpoints": true
     }
   ]
 }

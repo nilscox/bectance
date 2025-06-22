@@ -1,10 +1,10 @@
-import { and, asc, eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 
 import { NotFoundError } from '../../errors.js';
 import { emitDomainEvent } from '../../events.js';
 import { Database } from '../../persistence/database.js';
 import { shoppingList, shoppingListItems } from '../../persistence/schema.js';
-import { defined } from '../../utils.js';
+import { assert } from '../../utils.js';
 import { findProduct } from '../product/product.domain.js';
 
 export async function listShoppingLists(db: Database, filters?: { name?: string }) {
@@ -34,18 +34,22 @@ export async function getShoppingList(db: Database, listId: string) {
         with: {
           product: true,
         },
-        orderBy: asc(shoppingListItems.position),
       },
     },
   });
 
-  return defined(list, new NotFoundError('Cannot find shopping list', { id: listId }));
+  assert(list, new NotFoundError('Cannot find shopping list', { id: listId }));
+
+  list.items.sort((a, b) => list.sortedItemIds.indexOf(a.id) - list.sortedItemIds.indexOf(b.id));
+
+  return list;
 }
 
 export async function createShoppingList(db: Database, shoppingListId: string, shoppingListName: string) {
   await db.insert(shoppingList).values({
     id: shoppingListId,
     name: shoppingListName,
+    sortedItemIds: [],
   });
 }
 
@@ -61,8 +65,6 @@ export async function createShoppingListItem(
 
   const product = productId ? await findProduct(db, productId) : undefined;
 
-  const count = await db.$count(shoppingListItems, eq(shoppingListItems.shoppingListId, listId));
-
   const values: typeof shoppingListItems.$inferInsert = {
     id: itemId,
     shoppingListId: listId,
@@ -70,7 +72,6 @@ export async function createShoppingListItem(
     label,
     quantity: options.quantity || product?.defaultQuantity,
     checked: options.checked ?? false,
-    position: count,
   };
 
   await db.insert(shoppingListItems).values(values);
