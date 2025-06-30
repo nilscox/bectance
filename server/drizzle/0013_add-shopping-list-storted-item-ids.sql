@@ -1,5 +1,7 @@
 ALTER TABLE "shopping_lists" ADD COLUMN "sorted_item_ids" varchar(16)[];
 
+UPDATE shopping_lists SET "sorted_item_ids" = '{}';
+
 UPDATE shopping_lists sl
 SET sorted_item_ids = sub.items
 FROM (
